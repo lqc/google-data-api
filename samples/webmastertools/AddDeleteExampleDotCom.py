@@ -19,10 +19,7 @@ import urllib
 
 import gdata.webmastertools.service
 import gdata.service
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 import getpass
 

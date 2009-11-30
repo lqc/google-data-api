@@ -21,10 +21,7 @@ __author__ = 'api.jscudder@gmail.com (Jeff Scudder)'
 
 import sys
 import unittest
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom.data
 import atom.core
 import gdata.test_config as conf

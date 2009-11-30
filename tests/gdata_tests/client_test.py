@@ -26,7 +26,7 @@ import gdata.client
 import gdata.gauth
 import gdata.data
 import atom.mock_http_core
-import StringIO
+import io as StringIO
 
 
 class ClientLoginTest(unittest.TestCase):
@@ -64,7 +64,7 @@ class ClientLoginTest(unittest.TestCase):
       token = client.request_client_login_token('email', 'pw', '', '')
       self.fail('should raise a CaptchaChallenge on a 403 with a '
                 'CaptchRequired error.')
-    except gdata.client.CaptchaChallenge, challenge:
+    except gdata.client.CaptchaChallenge as challenge:
       self.assertEquals(challenge.captcha_url, 
           'http://www.google.com/accounts/'
           'Captcha?ctoken=HiteT4bVoP6-yFkHPibe7O9EqxeiI7lUSN')
@@ -252,7 +252,7 @@ class RequestTest(unittest.TestCase):
     try:
       response = client.request(method='PUT', uri='http://example.com/2?gsessionid=loop')
       self.fail('Loop URL should have redirected forever.')
-    except gdata.client.RedirectError, err:
+    except gdata.client.RedirectError as err:
       self.assert_(str(err).startswith('Too many redirects from server'))
 
   def test_lowercase_location(self):

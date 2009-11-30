@@ -23,10 +23,10 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
 import os
-import StringIO
-import urlparse
+import io as StringIO
+import urllib.parse as urlparse
 import urllib
-import httplib
+import http.client as httplib
 ssl = None
 try:
   import ssl

@@ -22,20 +22,7 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
 import inspect
-try:
-  from xml.etree import cElementTree as ElementTree
-except ImportError:
-  try:
-    import cElementTree as ElementTree
-  except ImportError:
-    try:
-      from xml.etree import ElementTree
-    except ImportError:
-      from elementtree import ElementTree
-
-
-STRING_ENCODING = 'utf-8'
-
+import lxml.etree as ElementTree
 
 class XmlElement(object):
   """Represents an element node in an XML document.
@@ -88,7 +75,7 @@ class XmlElement(object):
       if not pair[0].startswith('_') and pair[0] != 'text':
         member_type = pair[1]
         if (isinstance(member_type, tuple) or isinstance(member_type, list)
-            or isinstance(member_type, (str, unicode))
+            or isinstance(member_type, basestring)
             or (inspect.isclass(member_type)
                 and issubclass(member_type, XmlElement))):
           members.append(pair)
@@ -291,12 +278,12 @@ class XmlElement(object):
     if tree.text:
       self.text = tree.text
 
-  def _to_tree(self, version=1, encoding=None):
+  def _to_tree(self, version=1):
     new_tree = ElementTree.Element(_get_qname(self, version))
-    self._attach_members(new_tree, version, encoding)
+    self._attach_members(new_tree, version)
     return new_tree
 
-  def _attach_members(self, tree, version=1, encoding=None):
+  def _attach_members(self, tree, version=1):
     """Convert members to XML elements/attributes and add them to the tree.
 
     Args:
@@ -306,11 +293,9 @@ class XmlElement(object):
             _expected_attributes. The elements and attributes stored in
             other_attributes and other_elements are also added a children
             of this tree.
-      version: int Ingnored in this method but used by VersionedElement.
-      encoding: str (optional)
+      version: int Ingnored in this method but used by VersionedElement.      
     """
-    qname, elements, attributes = self.__class__._get_rules(version)
-    encoding = encoding or STRING_ENCODING
+    qname, elements, attributes = self.__class__._get_rules(version)    
     # Add the expected elements and attributes to the tree.
     if elements:
       for tag, element_def in elements.iteritems():
@@ -329,21 +314,18 @@ class XmlElement(object):
     # Add the unexpected (other) elements and attributes to the tree.
     for element in self._other_elements:
       element._become_child(tree, version)
-    for key, value in self._other_attributes.iteritems():
+    
+    for key, value in self._other_attributes.items():
       # I'm not sure if unicode can be used in the attribute name, so for now
-      # we assume the encoding is correct for the attribute name.
-      if not isinstance(value, unicode):
-        value = value.decode(encoding)
+      # we assume the encoding is correct for the attribute name.      
       tree.attrib[key] = value
+    
     if self.text:
-      if isinstance(self.text, unicode):
         tree.text = self.text
-      else:
-        tree.text = self.text.decode(encoding)
 
-  def to_string(self, version=1, encoding=None):
+  def to_string(self, version=1):
     """Converts this object to XML."""
-    return ElementTree.tostring(self._to_tree(version, encoding))
+    return ElementTree.tostring(self._to_tree(version), encoding=str)
 
   ToString = to_string
 
@@ -482,25 +464,22 @@ def _qname_matches(tag, namespace, qname):
           and member_namespace is None))
 
 
-def parse(xml_string, target_class=None, version=1, encoding=None):
+def parse(xml_string, target_class=None, version=1):
   """Parses the XML string according to the rules for the target_class.
 
   Args:
-    xml_string: str or unicode
+    xml_string: bytes
     target_class: XmlElement or a subclass. If None is specified, the
         XmlElement class is used.
     version: int (optional) The version of the schema which should be used when
         converting the XML into an object. The default is 1.
-    encoding: str (optional) The character encoding of the bytes in the
-        xml_string. Default is 'UTF-8'.
   """
   if target_class is None:
     target_class = XmlElement
-  if isinstance(xml_string, unicode):
-    if encoding is None:
-      xml_string = xml_string.encode(STRING_ENCODING)
-    else:
-      xml_string = xml_string.encode(encoding)
+    
+  if not isinstance(xml_string, bytes):
+    raise Exception("This function only accepts bytes")
+        
   tree = ElementTree.fromstring(xml_string)
   return _xml_element_from_tree(tree, target_class, version)
 

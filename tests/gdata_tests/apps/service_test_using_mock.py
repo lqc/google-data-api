@@ -18,10 +18,7 @@ __author__ = 'tmatsuo@sios.com (Takashi Matsuo)'
 
 import unittest
 import time, os
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import re
 import pickle
 

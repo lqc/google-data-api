@@ -17,10 +17,7 @@
 __author__ = 'api.rboyd@google.com (Ryan Boyd)'
 
 import unittest
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 import atom.mock_http
 import gdata.calendar

@@ -37,7 +37,7 @@ __author__ = 'api.jscudder (Jeff Scudder)'
 
 import types
 import os
-import httplib
+import http.client as httplib
 import atom.url
 import atom.http_interface
 import socket
@@ -123,7 +123,7 @@ class HttpClient(atom.http_interface.GenericHttpClient):
       return self.v2_http_client.request(http_request=http_request)
 
     if not isinstance(url, atom.url.Url):
-      if isinstance(url, types.StringTypes):
+      if isinstance(url, str):
         url = atom.url.parse_url(url)
       else:
         raise atom.http_interface.UnparsableUrlObject('Unable to parse url '

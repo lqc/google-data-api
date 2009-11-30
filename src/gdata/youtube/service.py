@@ -23,16 +23,7 @@
 __author__ = ('api.stephaniel@gmail.com (Stephanie Liu), '
               'api.jhartmann@gmail.com (Jochen Hartmann)')
 
-try:
-  from xml.etree import cElementTree as ElementTree
-except ImportError:
-  try:
-    import cElementTree as ElementTree
-  except ImportError:
-    try:
-      from xml.etree import ElementTree
-    except ImportError:
-      from elementtree import ElementTree
+import lxml.etree as ElementTree
 import os
 import atom
 import gdata
@@ -652,7 +643,7 @@ class YouTubeService(gdata.service.GDataService):
       try:
         return self.Post(video_entry, uri=upload_uri, media_source=mediasource,
                          converter=gdata.youtube.YouTubeVideoEntryFromString)
-      except gdata.service.RequestError, e:
+      except gdata.service.RequestError as e:
         raise YouTubeError(e.args[0])
     finally:
       del(self.additional_headers['Slug'])
@@ -712,7 +703,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     try:
       response = self.Post(video_entry, uri)
-    except gdata.service.RequestError, e:
+    except gdata.service.RequestError as e:
       raise YouTubeError(e.args[0])
 
     tree = ElementTree.fromstring(response)

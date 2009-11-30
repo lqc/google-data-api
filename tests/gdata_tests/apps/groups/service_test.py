@@ -21,10 +21,7 @@ __author__ = 'google-apps-apis@googlegroups.com'
 
 
 import unittest
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 import gdata.apps
 import gdata.apps.service

@@ -841,7 +841,7 @@ class OAuthToken(atom.http_interface.GenericToken):
       dict Header to be sent with every subsequent request after
       authentication.
     """
-    if isinstance(http_url, types.StringTypes):
+    if isinstance(http_url, str):
       http_url = atom.url.parse_url(http_url)
     header = None
     token = None

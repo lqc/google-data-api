@@ -6,9 +6,13 @@ import os
 import math
 import base64
 import binascii
-import sha
+import hashlib as sha
+import array
 
-from compat import *
+# 
+# We don't need the compat stuff anymore, so few updates:
+#  numbits == x.bit_length
+#  numbytes == x.bit_length // 8
 
 
 # **************************************************************************
@@ -29,7 +33,7 @@ try:
     import cryptlib_py
     try:
         cryptlib_py.cryptInit()
-    except cryptlib_py.CryptException, e:
+    except cryptlib_py.CryptException as e:
         #If tlslite and cryptoIDlib are both present,
         #they might each try to re-initialize this,
         #so we're tolerant of that.
@@ -76,7 +80,7 @@ except:
                                           cryptlib_py.CRYPT_CTXINFO_MODE,
                                           cryptlib_py.CRYPT_MODE_OFB)
             cryptlib_py.cryptGenerateKey(randomKey)
-            bytes = createByteArrayZeros(howMany)
+            bytes = array.array('B', [0] * howMany)
             cryptlib_py.cryptEncrypt(randomKey, bytes)
             return bytes
         prngName = "cryptlib"
@@ -86,7 +90,7 @@ except:
         try:
             devRandomFile = open("/dev/urandom", "rb")
             def getRandomBytes(howMany):
-                return stringToBytes(devRandomFile.read(howMany))
+                return array.array('B', devRandomFile.read(howMany))
             prngName = "/dev/urandom"
         except IOError:
             #Else get Win32 CryptoAPI PRNG
@@ -96,7 +100,7 @@ except:
                     s = win32prng.getRandomBytes(howMany)
                     if len(s) != howMany:
                         raise AssertionError()
-                    return stringToBytes(s)
+                    return array.array('B', s)
                 prngName ="CryptoAPI"
             except ImportError:
                 #Else no PRNG :-(
@@ -109,70 +113,70 @@ except:
 # Converter Functions
 # **************************************************************************
 
-def bytesToNumber(bytes):
-    total = 0L
-    multiplier = 1L
-    for count in range(len(bytes)-1, -1, -1):
+def arrayToNumber(a):
+    total = 0
+    multiplier = 1
+    for count in range(len(a)-1, -1, -1):
         byte = bytes[count]
         total += multiplier * byte
         multiplier *= 256
     return total
 
-def numberToBytes(n):
+def numberToArray(n):
     howManyBytes = numBytes(n)
-    bytes = createByteArrayZeros(howManyBytes)
+    a = array.array('B', [0]*howManyBytes)
     for count in range(howManyBytes-1, -1, -1):
-        bytes[count] = int(n % 256)
+        a[count] = int(n % 256)
         n >>= 8
-    return bytes
+    return a
 
-def bytesToBase64(bytes):
-    s = bytesToString(bytes)
-    return stringToBase64(s)
+def arrayToBase64(ba):
+    s = arrayToBytes(ba)
+    return bytesToBase64(s)
 
-def base64ToBytes(s):
-    s = base64ToString(s)
-    return stringToBytes(s)
+def base64ToArray(s):
+    s = base64ToBytes(s)
+    return bytesToArray(s)
 
 def numberToBase64(n):
-    bytes = numberToBytes(n)
-    return bytesToBase64(bytes)
+    a = numberToArray(n)
+    return arrayToBase64(a)
 
 def base64ToNumber(s):
-    bytes = base64ToBytes(s)
-    return bytesToNumber(bytes)
+    a = base64ToArray(s)
+    return bytesToNumber(a)
 
-def stringToNumber(s):
-    bytes = stringToBytes(s)
-    return bytesToNumber(bytes)
+def bytesToNumber(s):
+    a = bytesToArray(s)
+    return arrayToNumber(a)
 
 def numberToString(s):
-    bytes = numberToBytes(s)
-    return bytesToString(bytes)
+    a = numberToArray(s)
+    return arrayToBytes(a)
 
-def base64ToString(s):
+def base64ToBytes(s):
     try:
         return base64.decodestring(s)
-    except binascii.Error, e:
+    except binascii.Error as e:
         raise SyntaxError(e)
-    except binascii.Incomplete, e:
+    except binascii.Incomplete as e:
         raise SyntaxError(e)
 
-def stringToBase64(s):
+def bytesToBase64(s):
     return base64.encodestring(s).replace("\n", "")
 
 def mpiToNumber(mpi): #mpi is an openssl-format bignum string
     if (ord(mpi[4]) & 0x80) !=0: #Make sure this is a positive number
         raise AssertionError()
-    bytes = stringToBytes(mpi[4:])
+    bytes = bytesToArray(mpi[4:])
     return bytesToNumber(bytes)
 
 def numberToMPI(n):
-    bytes = numberToBytes(n)
+    bytes = numberToArray(n)
     ext = 0
     #If the high-order bit is going to be set,
     #add an extra byte of zeros
-    if (numBits(n) & 0x7)==0:
+    if (n.bit_length & 0x7)==0:
         ext = 1
     length = numBytes(n) + ext
     bytes = concatArrays(createByteArrayZeros(4+ext), bytes)
@@ -191,16 +195,15 @@ def numberToMPI(n):
 def numBytes(n):
     if n==0:
         return 0
-    bits = numBits(n)
-    return int(math.ceil(bits / 8.0))
+    return n.bit_length // 8
 
 def hashAndBase64(s):
-    return stringToBase64(sha.sha(s).digest())
+    return bytesToBase64(sha.sha(s).digest())
 
 def getBase64Nonce(numChars=22): #defaults to an 132 bit nonce
-    bytes = getRandomBytes(numChars)
-    bytesStr = "".join([chr(b) for b in bytes])
-    return stringToBase64(bytesStr)[:numChars]
+    rb = getRandomBytes(numChars)
+    bytesStr = "".join( map(chr, rb) )
+    return bytesToBase64(bytesStr)[:numChars]
 
 
 # **************************************************************************
@@ -210,8 +213,8 @@ def getBase64Nonce(numChars=22): #defaults to an 132 bit nonce
 def getRandomNumber(low, high):
     if low >= high:
         raise AssertionError()
-    howManyBits = numBits(high)
-    howManyBytes = numBytes(high)
+    howManyBits = high.bit_length
+    howManyBytes = high.bit_length // 8
     lastBits = howManyBits % 8
     while 1:
         bytes = getRandomBytes(howManyBytes)
@@ -227,20 +230,16 @@ def gcd(a,b):
         a, b = b, a % b
     return a
 
-def lcm(a, b):
-    #This will break when python division changes, but we can't use // cause
-    #of Jython
-    return (a * b) / gcd(a, b)
+def lcm(a, b):    
+    return (a * b) // gcd(a, b)
 
 #Returns inverse of a mod b, zero if none
 #Uses Extended Euclidean Algorithm
 def invMod(a, b):
     c, d = a, b
     uc, ud = 1, 0
-    while c != 0:
-        #This will break when python division changes, but we can't use //
-        #cause of Jython
-        q = d / c
+    while c != 0:        
+        q = d // c
         c, d = d-(q*c), c
         uc, ud = ud - (q * uc), uc
     if d == 1:
@@ -254,7 +253,7 @@ if gmpyLoaded:
         power = gmpy.mpz(power)
         modulus = gmpy.mpz(modulus)
         result = pow(base, power, modulus)
-        return long(result)
+        return int(result)
 
 else:
     #Copied from Bryan G. Olson's post to comp.lang.python
@@ -284,7 +283,7 @@ else:
 
         # Make a table of powers of base up to 2**nBitScan - 1
         lowPowers = [1]
-        for i in xrange(1, exp2):
+        for i in range(1, exp2):
             lowPowers.append((lowPowers[i-1] * base) % modulus)
 
         # To exponentiate by the first nibble, look it up in the table
@@ -295,7 +294,7 @@ else:
         # base^nibble
         while nibbles:
             nib, nibbles = nibbles
-            for i in xrange(nBitScan):
+            for i in range(nBitScan):
                 prod = (prod * prod) % modulus
             if nib: prod = (prod * lowPowers[nib]) % modulus
 
@@ -311,7 +310,7 @@ else:
 
 #Pre-calculate a sieve of the ~100 primes < 1000:
 def makeSieve(n):
-    sieve = range(n)
+    sieve = list(range(n))
     for count in range(2, int(math.sqrt(n))):
         if sieve[count] == 0:
             continue
@@ -332,10 +331,10 @@ def isPrime(n, iterations=5, display=False):
     #Passed trial division, proceed to Rabin-Miller
     #Rabin-Miller implemented per Ferguson & Schneier
     #Compute s, t for Rabin-Miller
-    if display: print "*",
+    if display: print("*", end=" ")
     s, t = n-1, 0
     while s % 2 == 0:
-        s, t = s/2, t+1
+        s, t = s//2, t+1
     #Repeat Rabin-Miller x times
     a = 2 #Use 2 as a base for first iteration speedup, per HAC
     for count in range(iterations):
@@ -359,12 +358,12 @@ def getRandomPrime(bits, display=False):
     #
     #Since 30 is lcm(2,3,5), we'll set our test numbers to
     #29 % 30 and keep them there
-    low = (2L ** (bits-1)) * 3/2
-    high = 2L ** bits - 30
+    low = (2 ** (bits-1)) * 3//2
+    high = 2 ** bits - 30
     p = getRandomNumber(low, high)
     p += 29 - (p % 30)
     while 1:
-        if display: print ".",
+        if display: print(".", )
         p += 30
         if p >= high:
             p = getRandomNumber(low, high)
@@ -381,12 +380,12 @@ def getRandomSafePrime(bits, display=False):
     #
     #Since 30 is lcm(2,3,5), we'll set our test numbers to
     #29 % 30 and keep them there
-    low = (2 ** (bits-2)) * 3/2
+    low = (2 ** (bits-2)) * 3//2
     high = (2 ** (bits-1)) - 30
     q = getRandomNumber(low, high)
     q += 29 - (q % 30)
     while 1:
-        if display: print ".",
+        if display: print(".",)
         q += 30
         if (q >= high):
             q = getRandomNumber(low, high)

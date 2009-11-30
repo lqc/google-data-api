@@ -1,9 +1,9 @@
 """Pure-Python RSA implementation."""
 
-from cryptomath import *
-import xmltools
-from ASN1Parser import ASN1Parser
-from RSAKey import *
+from gdata.tlslite.utils.cryptomath import *
+import gdata.tlslite.utils.xmltools as xmltools
+from gdata.tlslite.utils.ASN1Parser import ASN1Parser
+from gdata.tlslite.utils.RSAKey import *
 
 class Python_RSAKey(RSAKey):
     def __init__(self, n=0, e=0, d=0, p=0, q=0, dP=0, dQ=0, qInv=0):
@@ -99,7 +99,7 @@ class Python_RSAKey(RSAKey):
         q = getRandomPrime(bits/2, False)
         t = lcm(p-1, q-1)
         key.n = p * q
-        key.e = 3L  #Needed to be long, for Java
+        key.e = 3  #Needed to be long, for Java
         key.d = invMod(key.e, t)
         key.p = p
         key.q = q
@@ -113,21 +113,21 @@ class Python_RSAKey(RSAKey):
         """Parse a string containing a <privateKey> or <publicKey>, or
         PEM-encoded key."""
 
-        start = s.find("-----BEGIN PRIVATE KEY-----")
+        start = s.find(b"-----BEGIN PRIVATE KEY-----")
         if start != -1:
-            end = s.find("-----END PRIVATE KEY-----")
+            end = s.find(b"-----END PRIVATE KEY-----")
             if end == -1:
                 raise SyntaxError("Missing PEM Postfix")
-            s = s[start+len("-----BEGIN PRIVATE KEY -----") : end]
+            s = s[start+len(b"-----BEGIN PRIVATE KEY -----") : end]
             bytes = base64ToBytes(s)
             return Python_RSAKey._parsePKCS8(bytes)
         else:
-            start = s.find("-----BEGIN RSA PRIVATE KEY-----")
+            start = s.find(b"-----BEGIN RSA PRIVATE KEY-----")
             if start != -1:
-                end = s.find("-----END RSA PRIVATE KEY-----")
+                end = s.find(b"-----END RSA PRIVATE KEY-----")
                 if end == -1:
                     raise SyntaxError("Missing PEM Postfix")
-                s = s[start+len("-----BEGIN RSA PRIVATE KEY -----") : end]
+                s = s[start+len(b"-----BEGIN RSA PRIVATE KEY -----") : end]
                 bytes = base64ToBytes(s)
                 return Python_RSAKey._parseSSLeay(bytes)
         raise SyntaxError("Missing PEM Prefix")

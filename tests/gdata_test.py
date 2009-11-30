@@ -19,10 +19,7 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
 import unittest
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import gdata
 import atom
 from gdata import test_data

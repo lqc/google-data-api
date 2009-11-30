@@ -1,6 +1,6 @@
 """Abstract class for RSA."""
 
-from cryptomath import *
+from gdata.tlslite.utils.cryptomath import *
 
 
 class RSAKey:

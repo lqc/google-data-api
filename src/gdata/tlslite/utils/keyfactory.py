@@ -3,11 +3,9 @@
 parseAsPrivateKey
 """
 
-from compat import *
-
-from RSAKey import RSAKey
-from Python_RSAKey import Python_RSAKey
-import cryptomath
+from .RSAKey import RSAKey
+from .Python_RSAKey import Python_RSAKey
+from . import cryptomath
 
 if cryptomath.m2cryptoLoaded:
     from OpenSSL_RSAKey import OpenSSL_RSAKey
@@ -117,8 +115,8 @@ def parsePEMKey(s, private=False, public=False, passwordCallback=None,
     and M2Crypto are installed.  In this case, passwordCallback will be
     invoked to query the user for the password.
 
-    @type s: str
-    @param s: A string containing a PEM-encoded public or private key.
+    @type s: bytes
+    @param s: A bytearray containing a PEM-encoded public or private key.
 
     @type private: bool
     @param private: If True, a L{SyntaxError} will be raised if the
@@ -141,6 +139,9 @@ def parsePEMKey(s, private=False, public=False, passwordCallback=None,
 
     @raise SyntaxError: If the key is not properly formatted.
     """
+    if not isinstance(s, bytes):
+        raise TypeError("You surely wanted to parse the KEY from array of bytes, not %r" % type(s))
+    
     for implementation in implementations:
         if implementation == "openssl" and cryptomath.m2cryptoLoaded:
             key = OpenSSL_RSAKey.parse(s, passwordCallback)

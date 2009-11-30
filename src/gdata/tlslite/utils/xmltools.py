@@ -3,7 +3,6 @@
 This module has misc. helper functions for working with XML DOM nodes."""
 
 import re
-from compat import *
 
 import os
 if os.name != "java":
@@ -25,7 +24,7 @@ else:
 def parseAndStripWhitespace(s):
     try:
         element = parseDocument(s).documentElement
-    except BaseException, e:
+    except BaseException as e:
         raise SyntaxError(str(e))
     stripWhitespace(element)
     return element

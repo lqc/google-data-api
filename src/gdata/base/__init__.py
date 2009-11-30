@@ -20,16 +20,7 @@
 __author__ = 'api.jscudder (Jeffrey Scudder)'
 
 
-try:
-  from xml.etree import cElementTree as ElementTree
-except ImportError:
-  try:
-    import cElementTree as ElementTree
-  except ImportError:
-    try:
-      from xml.etree import ElementTree
-    except ImportError:
-      from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 import gdata
 
@@ -120,7 +111,7 @@ class ItemAttributeContainer(object):
     Deletes the first extension element which matches name. 
     """
 
-    for i in xrange(len(self.item_attributes)):
+    for i in range(len(self.item_attributes)):
       if self.item_attributes[i].name == name:
         del self.item_attributes[i]
         return
@@ -129,7 +120,7 @@ class ItemAttributeContainer(object):
   # convert custom attributes to members
   def _ConvertElementTreeToMember(self, child_tree):
     # Find the element's tag in this class's list of child members
-    if self.__class__._children.has_key(child_tree.tag):
+    if child_tree.tag in self.__class__._children:
       member_name = self.__class__._children[child_tree.tag][0]
       member_class = self.__class__._children[child_tree.tag][1]
       # If the class member is supposed to contain a list, make sure the
@@ -147,7 +138,7 @@ class ItemAttributeContainer(object):
       # If this is in the gbase namespace, make it into an extension element.
       name = child_tree.tag[child_tree.tag.index('}')+1:]
       value = child_tree.text
-      if child_tree.attrib.has_key('type'):
+      if 'type' in child_tree.attrib:
         value_type = child_tree.attrib['type']
       else:
         value_type = None
@@ -162,7 +153,7 @@ class ItemAttributeContainer(object):
     # This uses the class's _children dictionary to find the members which
     # should become XML child nodes.
     member_node_names = [values[0] for tag, values in 
-                                       self.__class__._children.iteritems()]
+                                       self.__class__._children.items()]
     for member_name in member_node_names:
       member = getattr(self, member_name)
       if member is None:
@@ -173,7 +164,7 @@ class ItemAttributeContainer(object):
       else:
         member._BecomeChildElement(tree)
     # Convert the members of this class which are XML attributes.
-    for xml_attribute, member_name in self.__class__._attributes.iteritems():
+    for xml_attribute, member_name in self.__class__._attributes.items():
       member = getattr(self, member_name)
       if member is not None:
         tree.attrib[xml_attribute] = member
@@ -225,10 +216,9 @@ class ItemAttribute(atom.Text):
     self.extension_attributes = extension_attributes or {}
     
   def _BecomeChildElement(self, tree):
-    new_child = ElementTree.Element('')
-    tree.append(new_child)
-    new_child.tag = '{%s}%s' % (self.__class__._namespace, 
-                                self.name)
+    new_child = ElementTree.Element( '{%s}%s' % (self.__class__._namespace, 
+                                self.name) )
+    tree.append(new_child) 
     self._AddMembersToElementTree(new_child)
   
   def _ToElementTree(self):

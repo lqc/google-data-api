@@ -36,22 +36,13 @@ import atom.http
 import atom.token_store
 
 import os
-import httplib
+import http.client as httplib
 import urllib
 import re
 import base64
 import socket
 import warnings
-try:
-  from xml.etree import cElementTree as ElementTree
-except ImportError:
-  try:
-    import cElementTree as ElementTree
-  except ImportError:
-    try:
-      from xml.etree import ElementTree
-    except ImportError:
-      from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 
 
@@ -426,7 +417,7 @@ def PrepareConnection(service, full_uri):
        
       p_status=response.split()[1]
       if p_status!=str(200):
-        raise 'Error status=',str(p_status)
+        raise ('Error status=', str(p_status)) # Throwing a string? WTH?
 
       # Trivial setup for ssl socket.
       ssl = socket.ssl(p_sock, None, None)
@@ -544,7 +535,7 @@ def DictionaryToParamList(url_parameters, escape_params=True):
   """
   # Choose which function to use when modifying the query and parameters.
   # Use quote_plus when escape_params is true.
-  transform_op = [str, urllib.quote_plus][bool(escape_params)]
+  transform_op = [str, urllib.parse.quote_plus][bool(escape_params)]
   # Create a list of tuples containing the escaped version of the
   # parameter-value pairs.
   parameter_tuples = [(transform_op(param), transform_op(value))

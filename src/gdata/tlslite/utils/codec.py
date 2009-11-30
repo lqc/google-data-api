@@ -1,7 +1,5 @@
 """Classes for reading/writing binary data (such as TLS records)."""
 
-from compat import *
-
 class Writer:
     def __init__(self, length=0):
         #If length is zero, then this is just a "trial run" to determine length

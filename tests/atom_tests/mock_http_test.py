@@ -47,7 +47,7 @@ class MockHttpClientUnitTest(unittest.TestCase):
         'http://www.google.com/base/feeds/snippets?max-results=1')
     live_response_body = live_response.read()
     self.assertEquals(live_response.status, 200)
-    self.assertEquals(live_response_body.startswith('<?xml'), True)
+    self.assertEquals(live_response_body.startswith(b'<?xml'), True)
 
     # Requery for the now canned data.
     self.client.real_client = None

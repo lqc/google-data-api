@@ -18,10 +18,7 @@
 __author__ = 'api.laurabeth@gmail.com (Laura Beth Lincoln)'
 
 
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+import lxml.etree as ElementTree
 import gdata.spreadsheet.service
 import gdata.service
 import atom.service

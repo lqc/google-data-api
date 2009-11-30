@@ -2,7 +2,7 @@ import cgi
 import urllib
 import time
 import random
-import urlparse
+import urllib.parse 
 import hmac
 import binascii
 
@@ -22,7 +22,7 @@ def build_authenticate_header(realm=''):
 # url escape
 def escape(s):
     # escape '/' too
-    return urllib.quote(s, safe='~')
+    return urllib.parse.quote(s, safe='~')
 
 # util function: current timestamp
 # seconds since epoch (UTC)
@@ -144,9 +144,8 @@ class OAuthRequest(object):
             del params['oauth_signature']
         except:
             pass
-        key_values = params.items()
-        # sort lexicographically, first after key, then after value
-        key_values.sort()
+        
+        key_values = sorted(params.items())        
         # combine key value pairs in string and escape
         return '&'.join(['%s=%s' % (escape(str(k)), escape(str(v))) for k, v in key_values])
 
@@ -156,7 +155,7 @@ class OAuthRequest(object):
 
     # parses the url and rebuilds it to be scheme://host/path
     def get_normalized_http_url(self):
-        parts = urlparse.urlparse(self.http_url)
+        parts = urllib.parse.urlparse(self.http_url)
         url_string = '%s://%s%s' % (parts[0], parts[1], parts[2]) # scheme, netloc, path
         return url_string
         
@@ -194,7 +193,7 @@ class OAuthRequest(object):
             parameters.update(query_params)
 
         # URL parameters
-        param_str = urlparse.urlparse(http_url)[4] # query
+        param_str = urllib.parse.urlparse(http_url)[4] # query
         url_params = OAuthRequest._split_url_string(param_str)
         parameters.update(url_params)
 
@@ -249,7 +248,7 @@ class OAuthRequest(object):
             # split key-value
             param_parts = param.split('=', 1)
             # remove quotes and unescape the value
-            params[param_parts[0]] = urllib.unquote(param_parts[1].strip('\"'))
+            params[param_parts[0]] = urllib.parse.unquote(param_parts[1].strip('\"'))
         return params
     _split_header = staticmethod(_split_header)
     
@@ -257,7 +256,7 @@ class OAuthRequest(object):
     def _split_url_string(param_str):
         parameters = cgi.parse_qs(param_str, keep_blank_values=False)
         for k, v in parameters.iteritems():
-            parameters[k] = urllib.unquote(v[0])
+            parameters[k] = urllib.parse.unquote(v[0])
         return parameters
     _split_url_string = staticmethod(_split_url_string)
 

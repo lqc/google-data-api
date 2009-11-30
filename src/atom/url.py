@@ -18,7 +18,7 @@
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-import urlparse
+import urllib.parse as urlparse
 import urllib
 
 
@@ -49,10 +49,10 @@ def parse_url(url_string):
     for pair in param_pairs:
       pair_parts = pair.split('=')
       if len(pair_parts) > 1:
-        url.params[urllib.unquote_plus(pair_parts[0])] = (
-            urllib.unquote_plus(pair_parts[1]))
+        url.params[urllib.parse.unquote_plus(pair_parts[0])] = (
+            urllib.parse.unquote_plus(pair_parts[1]))
       elif len(pair_parts) == 1:
-        url.params[urllib.unquote_plus(pair_parts[0])] = None
+        url.params[urllib.parse.unquote_plus(pair_parts[0])] = None
   return url
    
 class Url(object):
@@ -88,9 +88,9 @@ class Url(object):
 
   def get_param_string(self):
     param_pairs = []
-    for key, value in self.params.iteritems():
-      param_pairs.append('='.join((urllib.quote_plus(key), 
-          urllib.quote_plus(str(value)))))
+    for key, value in self.params.items():
+      param_pairs.append('='.join((urllib.parse.quote_plus(key), 
+          urllib.parse.quote_plus(str(value)))))
     return '&'.join(param_pairs)
 
   def get_request_uri(self):

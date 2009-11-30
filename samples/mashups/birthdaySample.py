@@ -33,11 +33,7 @@
 
 __author__ = 'api.stephaniel@google.com (Stephanie Liu)'
 
-try:
-  from xml.etree import ElementTree # for Python 2.5 users
-except:  
-  from elementtree import ElementTree
-
+import lxml.etree as ElementTree
 import gdata.spreadsheet.service
 import gdata.calendar.service
 import gdata.calendar

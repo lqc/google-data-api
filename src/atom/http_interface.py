@@ -33,7 +33,7 @@
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-import StringIO
+import io as StringIO
 
 
 USER_AGENT = '%s GData-Python/2.0.2'

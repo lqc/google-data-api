@@ -35,7 +35,7 @@ class MockRequest(object):
   """
   def __init__(self, operation, url, data=None, headers=None):
     self.operation = operation
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, str):
       url = atom.url.parse_url(url)
     self.url = url
     self.data = data

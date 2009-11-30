@@ -21,7 +21,7 @@
 __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
-import StringIO
+import io as StringIO
 import pickle
 import os.path
 import tempfile

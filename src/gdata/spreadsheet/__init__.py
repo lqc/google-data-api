@@ -20,16 +20,7 @@
 __author__ = 'api.laurabeth@gmail.com (Laura Beth Lincoln)'
 
 
-try:
-  from xml.etree import cElementTree as ElementTree
-except ImportError:
-  try:
-    import cElementTree as ElementTree
-  except ImportError:
-    try:
-      from xml.etree import ElementTree
-    except ImportError:
-      from elementtree import ElementTree
+import lxml.etree as ElementTree
 import atom
 import gdata
 import re
@@ -125,10 +116,9 @@ class Custom(atom.AtomBase):
     self.extension_attributes = extension_attributes or {}
     
   def _BecomeChildElement(self, tree):
-    new_child = ElementTree.Element('')
-    tree.append(new_child)
-    new_child.tag = '{%s}%s' % (self.__class__._namespace, 
-                                self.column)
+    new_child = ElementTree.Element('{%s}%s' % (self.__class__._namespace, 
+                                self.column) )
+    tree.append(new_child)     
     self._AddMembersToElementTree(new_child)
   
   def _ToElementTree(self):
@@ -138,12 +128,12 @@ class Custom(atom.AtomBase):
     return new_tree
     
   def _HarvestElementTree(self, tree):
-    namespace_uri, local_tag = string.split(tree.tag[1:], "}", 1)
+    namespace_uri, local_tag = tree.tag[1:].split("}", 1)
     self.column = local_tag
     # Fill in the instance members from the contents of the XML tree.
     for child in tree:
       self._ConvertElementTreeToMember(child)
-    for attribute, value in tree.attrib.iteritems():
+    for attribute, value in tree.attrib.items():
       self._ConvertElementAttributeToMember(attribute, value)
     self.text = tree.text
 
@@ -154,7 +144,7 @@ def CustomFromString(xml_string):
 
   
 def _CustomFromElementTree(element_tree):
-  namespace_uri, local_tag = string.split(element_tree.tag[1:], "}", 1)
+  namespace_uri, local_tag = element_tree.tag[1:].split("}", 1)
   if namespace_uri == GSPREADSHEETS_EXTENDED_NAMESPACE:
     new_custom = Custom()
     new_custom._HarvestElementTree(element_tree)
@@ -319,7 +309,7 @@ class SpreadsheetsList(gdata.GDataEntry):
   # convert custom attributes to members
   def _ConvertElementTreeToMember(self, child_tree):
     # Find the element's tag in this class's list of child members
-    if self.__class__._children.has_key(child_tree.tag):
+    if child_tree.tag in self.__class__._children:
       member_name = self.__class__._children[child_tree.tag][0]
       member_class = self.__class__._children[child_tree.tag][1]
       # If the class member is supposed to contain a list, make sure the
@@ -349,7 +339,7 @@ class SpreadsheetsList(gdata.GDataEntry):
     # This uses the class's _children dictionary to find the members which
     # should become XML child nodes.
     member_node_names = [values[0] for tag, values in 
-                                       self.__class__._children.iteritems()]
+                                       self.__class__._children.items()]
     for member_name in member_node_names:
       member = getattr(self, member_name)
       if member is None:
@@ -360,12 +350,12 @@ class SpreadsheetsList(gdata.GDataEntry):
       else:
         member._BecomeChildElement(tree)
     # Convert the members of this class which are XML attributes.
-    for xml_attribute, member_name in self.__class__._attributes.iteritems():
+    for xml_attribute, member_name in self.__class__._attributes.items():
       member = getattr(self, member_name)
       if member is not None:
         tree.attrib[xml_attribute] = member
     # Convert all special custom item attributes to nodes
-    for name, custom in self.custom.iteritems():
+    for name, custom in self.custom.items():
       custom._BecomeChildElement(tree)
     # Lastly, call the ExtensionContainers's _AddMembersToElementTree to 
     # convert any extension attributes.

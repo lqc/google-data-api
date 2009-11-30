@@ -19,10 +19,7 @@ __author__ = 'livibetter (Yu-Jie Lin)'
 
 
 import unittest
-try:
-  from xml.etree import ElementTree
-except ImportError:
-  from elementtree import ElementTree
+from lxml.etree import ElementTree
 import gdata
 from gdata import test_data
 import gdata.webmastertools as webmastertools
