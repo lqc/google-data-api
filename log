@@ -1,0 +1,227 @@
+C:\Python31\lib\distutils\dist.py:259: UserWarning: Unknown distribution option: 'install_requires'
+  warnings.warn(msg)
+  File "C:\Python31\Lib\site-packages\atom\service.py", line 429
+    raise 'Error status=',str(p_status)
+                         ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\apps\adminsettings\service.py", line 56
+    except gdata.service.RequestError, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\apps\groups\service.py", line 84
+    except gdata.apps.service.AppsForYourDomainException, e:
+                                                        ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\apps\migration\service.py", line 79
+    except gdata.service.RequestError, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\apps\service.py", line 141
+    except gdata.service.RequestError, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\calendar\service.py", line 492
+    raise Error, "Order By must be either 'lastmodified' or 'starttime'"
+               ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\contacts\client.py", line 138
+    raise TypeError, "calendar_link Requires dictionary not %s" % type(link)
+                   ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Protocol\AllOrNothing.py", line 157
+    raise ValueError, "List must be at least length 2."
+                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Protocol\Chaffing.py", line 84
+    raise ValueError, "'factor' must be between 0.0 and 1.0"
+                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\PublicKey\DSA.py", line 43
+    if pow(2,159L) < q < pow(2,160L):
+                ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\PublicKey\ElGamal.py", line 74
+    raise error, 'argument for construct() wrong length'
+               ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\PublicKey\pubkey.py", line 73
+    raise error, 'Private key not available in this object'
+               ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\PublicKey\qNEW.py", line 52
+    b= (bits-1) % HASHBITS ; powb=2L << b
+                                   ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\PublicKey\RSA.py", line 38
+    p = q = 1L
+             ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\test.py", line 25
+    print '\nStream Ciphers:'
+                            ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Util\number.py", line 38
+    bits, power = 0,1L
+                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Util\randpool.py", line 119
+    except IOError, (num, msg):
+                  ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Util\RFC1751.py", line 76
+    raise ValueError, "Parity error in resulting key"
+                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\Crypto\Util\test.py", line 23
+    print '***ERROR: ', string
+                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\docs\client.py", line 77
+    raise  gdata.client.RequestError, {'status': server_response.status,
+                                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\docs\data.py", line 119
+    raise ValueError, ('Invalid resource id: %s, or manually creating the '
+                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\docs\service.py", line 125
+    raise ValueError, 'Invalid resource id: %s' % resource_id
+                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\exif\__init__.py", line 47
+    __author__ = u'havard@gulldahl.no'# (H\xe5vard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\geo\__init__.py", line 42
+    __author__ = u'havard@gulldahl.no'# (H\xe5vard Gulldahl)' #BUG: api chokes on non-ascii chars in __author__
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\media\__init__.py", line 48
+    __author__ = u'havard@gulldahl.no'# (H\xe5vard Gulldahl)' #BUG: api chokes on non-ascii chars in __author__
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\photos\service.py", line 78
+    __author__ = u'havard@gulldahl.no'# (H\xe5vard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\photos\__init__.py", line 36
+    __author__ = u'havard@gulldahl.no'# (H\xe5vard Gulldahl)' #BUG: pydoc chokes on non-ascii chars in __author__
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\sample_util.py", line 132
+    print 'Unable to read private key from file'
+                                               ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\service.py", line 813
+    raise CaptchaRequired, 'Captcha Required'
+                         ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\sites\client.py", line 100
+    raise  gdata.client.RequestError, {'status': server_response.status,
+                                    ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\test_config.py", line 80
+    print 'You can specify this on the command line using --%s' % self.name
+                                                              ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\integration\POP3_TLS.py", line 117
+    except socket.error, msg:
+                       ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\integration\TLSTwistedProtocolWrapper.py", line 27
+    raise socket.error, (errno.EWOULDBLOCK, "")
+                      ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\messages.py", line 367
+    self.srp_N = 0L
+                  ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\TLSConnection.py", line 1564
+    except socket.error, e:
+                       ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\TLSRecordLayer.py", line 206
+    except TLSRemoteAlert, alert:
+                         ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\utils\compat.py", line 123
+    n= 1L * n; #convert to long, if it isn't already
+        ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\utils\cryptomath.py", line 32
+    except cryptlib_py.CryptException, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\utils\jython_compat.py", line 87
+    n= 1L * n; #convert to long, if it isn't already
+        ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\utils\Python_RSAKey.py", line 102
+    key.e = 3L  #Needed to be long, for Java
+             ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\utils\xmltools.py", line 28
+    except BaseException, e:
+                        ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\X509.py", line 123
+    except cryptlib_py.CryptException, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\tlslite\X509CertChain.py", line 153
+    except cryptlib_py.CryptException, e:
+                                     ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\webmastertools\service.py", line 437
+    print sitemap_entry
+                      ^
+SyntaxError: invalid syntax
+
+  File "C:\Python31\Lib\site-packages\gdata\youtube\service.py", line 655
+    except gdata.service.RequestError, e:
+                                     ^
+SyntaxError: invalid syntax
+
