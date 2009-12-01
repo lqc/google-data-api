@@ -45,7 +45,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
     if self.created_user is not None:
       try:
         self.apps_client.DeleteUser(self.created_user.login.user_name)
-      except Exception, e:
+      except Exception as e:
         pass
 
   def test001RetrieveUser(self):
@@ -66,9 +66,9 @@ class AppsServiceUnitTest01(unittest.TestCase):
 
     try:
       non_existance = self.apps_client.RetrieveUser('nobody-' + self.postfix)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -107,7 +107,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
       created_user = self.apps_client.CreateUser(
         user_name=user_name, family_name=family_name, given_name=given_name,
         password=password, suspended=suspended)
-    except Exception, e:
+    except Exception as e:
       self.assert_(False, 'Unexpected exception occurred: %s' % e)
 
     self.created_user = created_user
@@ -123,7 +123,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
 
     try:
       user_feed = self.apps_client.RetrieveAllUsers()
-    except Exception, e:
+    except Exception as e:
       self.assert_(False, 'Unexpected exception occurred: %s' % e)
 
     succeed = False
@@ -145,7 +145,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
 
     try:
       new_user_entry = self.apps_client.UpdateUser(user_name, created_user)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     
     self.assert_(isinstance(new_user_entry, gdata.apps.UserEntry),
@@ -165,9 +165,9 @@ class AppsServiceUnitTest01(unittest.TestCase):
     # make sure that there is no account with nobody- + self.postfix
     try:
       tmp_entry = self.apps_client.RetrieveUser('nobody-' + self.postfix)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -176,9 +176,9 @@ class AppsServiceUnitTest01(unittest.TestCase):
     try:
       new_user_entry = self.apps_client.UpdateUser('nobody-' + self.postfix,
                                                    nobody)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -187,15 +187,15 @@ class AppsServiceUnitTest01(unittest.TestCase):
 
     try:
       self.apps_client.DeleteUser(user_name)
-    except Exception, e:
+    except Exception as e:
       self.assert_(False, 'Unexpected exception occurred: %s' % e)
 
     # make sure that the account deleted
     try:
       self.apps_client.RetrieveUser(user_name)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -204,9 +204,9 @@ class AppsServiceUnitTest01(unittest.TestCase):
     # make sure that DeleteUser fails with AppsForYourDomainException.
     try:
       self.apps_client.DeleteUser(user_name)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -225,7 +225,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
       created_user = self.apps_client.CreateUser(
         user_name=user_name, family_name=family_name, given_name=given_name,
         password=password, suspended=suspended)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.created_user = created_user
@@ -233,7 +233,7 @@ class AppsServiceUnitTest01(unittest.TestCase):
     nickname = 'emmy-' + self.postfix
     try:
       created_nickname = self.apps_client.CreateNickname(user_name, nickname)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.assert_(isinstance(created_nickname, gdata.apps.NicknameEntry),
@@ -275,9 +275,9 @@ class AppsServiceUnitTest01(unittest.TestCase):
     self.apps_client.DeleteNickname(nickname)
     try:
       non_existence = self.apps_client.RetrieveNickname(nickname)
-    except gdata.apps.service.AppsForYourDomainException, e:
+    except gdata.apps.service.AppsForYourDomainException as e:
       self.assertEquals(e.error_code, gdata.apps.service.ENTITY_DOES_NOT_EXIST)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     else:
       self.fail('No exception occurred')
@@ -298,13 +298,13 @@ class AppsServiceUnitTest02(unittest.TestCase):
     for user in self.created_users:
       try:
         self.apps_client.DeleteUser(user.login.user_name)
-      except Exception, e:
-        print e
+      except Exception as e:
+        print(e)
     for email_list in self.created_email_lists:
       try:
         self.apps_client.DeleteEmailList(email_list.email_list.name)
-      except Exception, e:
-        print e
+      except Exception as e:
+        print(e)
 
   def test001MethodsForEmaillist(self):
     """Tests methods for emaillist """
@@ -319,7 +319,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
       user_yuji = self.apps_client.CreateUser(
         user_name=user_name, family_name=family_name, given_name=given_name,
         password=password, suspended=suspended)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.created_users.append(user_yuji)
@@ -334,7 +334,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
       user_taro = self.apps_client.CreateUser(
         user_name=user_name, family_name=family_name, given_name=given_name,
         password=password, suspended=suspended)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.created_users.append(user_taro)
@@ -343,7 +343,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
     list_name = 'list01-' + self.postfix
     try:
       created_email_list = self.apps_client.CreateEmailList(list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.assert_(isinstance(created_email_list, gdata.apps.EmailListEntry),
@@ -357,7 +357,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
       recipient = self.apps_client.AddRecipientToEmailList(
         user_yuji.login.user_name + '@' + apps_domain,
         list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.assert_(isinstance(recipient, gdata.apps.EmailListRecipientEntry),
@@ -370,13 +370,13 @@ class AppsServiceUnitTest02(unittest.TestCase):
       recipient = self.apps_client.AddRecipientToEmailList(
         user_taro.login.user_name + '@' + apps_domain,
         list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     # tests RetrieveAllRecipients method
     try:
       recipient_feed = self.apps_client.RetrieveAllRecipients(list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.assert_(isinstance(recipient_feed, gdata.apps.EmailListRecipientFeed),
@@ -388,13 +388,13 @@ class AppsServiceUnitTest02(unittest.TestCase):
     try:
       self.apps_client.RemoveRecipientFromEmailList(
         user_taro.login.user_name + '@' + apps_domain, list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     # make sure that removal succeeded.
     try:
       recipient_feed = self.apps_client.RetrieveAllRecipients(list_name)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
 
     self.assert_(isinstance(recipient_feed, gdata.apps.EmailListRecipientFeed),
@@ -405,7 +405,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
     # tests RetrieveAllEmailLists
     try:
       list_feed = self.apps_client.RetrieveAllEmailLists()
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     self.assert_(isinstance(list_feed, gdata.apps.EmailListFeed),
         "Return value of RetrieveAllEmailLists method must be an instance" +
@@ -420,7 +420,7 @@ class AppsServiceUnitTest02(unittest.TestCase):
     try:
       list_feed = self.apps_client.RetrieveEmailLists(
         user_yuji.login.user_name + '@' + apps_domain)
-    except Exception, e:
+    except Exception as e:
       self.fail('Unexpected exception occurred: %s' % e)
     self.assert_(isinstance(list_feed, gdata.apps.EmailListFeed),
         "Return value of RetrieveEmailLists method must be an instance" +
@@ -464,13 +464,13 @@ class AppsServiceUnitTest03(unittest.TestCase):
     for user in self.created_users:
       try:
         self.apps_client.DeleteUser(user.login.user_name)
-      except Exception, e:
-        print e
+      except Exception as e:
+        print(e)
     for email_list in self.created_email_lists:
       try:
         self.apps_client.DeleteEmailList(email_list.email_list.name)
-      except Exception, e:
-        print e
+      except Exception as e:
+        print(e)
 
   def test001Pagenation(self):
     """Tests for pagination. It takes toooo long."""
@@ -482,7 +482,7 @@ class AppsServiceUnitTest03(unittest.TestCase):
       list_name = 'list%03d-' % i + self.postfix
       try:
         created_email_list = self.apps_client.CreateEmailList(list_name)
-      except Exception, e:
+      except Exception as e:
         self.fail('Unexpected exception occurred: %s' % e)
       self.created_email_lists.append(created_email_list)
 
@@ -493,7 +493,7 @@ if __name__ == '__main__':
   print ('Google Apps Service Tests\nNOTE: Please run these tests only with '
          'a test domain. The tests may delete or update your domain\'s '
          'account data.')
-  apps_domain = raw_input('Please enter your domain: ')
-  apps_username = raw_input('Please enter your username of admin account: ')
+  apps_domain = input('Please enter your domain: ')
+  apps_username = input('Please enter your username of admin account: ')
   apps_password = getpass.getpass()
   unittest.main()

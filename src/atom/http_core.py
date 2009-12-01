@@ -24,8 +24,8 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 import os
 import io as StringIO
-import urllib.parse as urlparse
 import urllib
+import urllib.parse
 import http.client as httplib
 ssl = None
 try:
@@ -73,7 +73,7 @@ class HttpRequest(object):
     self._body_parts = []
     if method is not None:
       self.method = method
-    if isinstance(uri, (str, unicode)):
+    if isinstance(uri, str):
       uri = Uri.parse_uri(uri)
     self.uri = uri or Uri()
 
@@ -160,7 +160,7 @@ class HttpRequest(object):
       mime_type: str The MIME type of the form data being sent. Defaults
                  to 'application/x-www-form-urlencoded'.
     """
-    body = urllib.urlencode(form_data)
+    body = urllib.parse.urlencode(form_data)
     self.add_body_part(body, mime_type)
 
   AddFormInputs = add_form_inputs
@@ -217,8 +217,8 @@ class Uri(object):
   def _get_query_string(self):
     param_pairs = []
     for key, value in self.query.iteritems():
-      param_pairs.append('='.join((urllib.quote_plus(key),
-          urllib.quote_plus(str(value)))))
+      param_pairs.append('='.join((urllib.parse.quote_plus(key),
+          urllib.parse.quote_plus(str(value)))))
     return '&'.join(param_pairs)
 
   def _get_relative_path(self):
@@ -281,7 +281,7 @@ class Uri(object):
     This method can accept partial URIs, but it will leave missing
     members of the Uri unset.
     """
-    parts = urlparse.urlparse(uri_string)
+    parts = urllib.parse.urlparse(uri_string)
     uri = Uri()
     if parts[0]:
       uri.scheme = parts[0]
@@ -298,10 +298,10 @@ class Uri(object):
       for pair in param_pairs:
         pair_parts = pair.split('=')
         if len(pair_parts) > 1:
-          uri.query[urllib.unquote_plus(pair_parts[0])] = (
-              urllib.unquote_plus(pair_parts[1]))
+          uri.query[urllib.parse.unquote_plus(pair_parts[0])] = (
+              urllib.parse.unquote_plus(pair_parts[1]))
         elif len(pair_parts) == 1:
-          uri.query[urllib.unquote_plus(pair_parts[0])] = None
+          uri.query[urllib.parse.unquote_plus(pair_parts[0])] = None
     return uri
 
   parse_uri = staticmethod(parse_uri)
@@ -393,7 +393,7 @@ class HttpClient(object):
                   which can be converted to strings using str. Each of these
                   will be sent in order as the body of the HTTP request.
     """
-    if isinstance(uri, (str, unicode)):
+    if isinstance(uri, str):
       uri = Uri.parse_uri(uri)
     connection = self._get_connection(uri, headers=headers)
 
@@ -436,7 +436,7 @@ class HttpClient(object):
 
 
 def _send_data_part(data, connection):
-  if isinstance(data, (str, unicode)):
+  if isinstance(data, str):
     # I might want to just allow str, not unicode.
     connection.send(data)
     return

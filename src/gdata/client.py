@@ -203,7 +203,7 @@ class GDClient(atom.client.AtomPubClient):
     Args:
       method: str The HTTP verb for this request, usually 'GET', 'POST',
               'PUT', or 'DELETE'
-      uri: atom.http_core.Uri, str, or unicode The URL being requested.
+      uri: atom.http_core.Uri, str The URL being requested.
       auth_token: An object which sets the Authorization HTTP header in its
                   modify_request method. Recommended classes include
                   gdata.gauth.ClientLoginToken and gdata.gauth.AuthSubToken
@@ -235,7 +235,7 @@ class GDClient(atom.client.AtomPubClient):
       body will be converted to the class using
       atom.core.parse.
     """
-    if isinstance(uri, (str, unicode)):
+    if isinstance(uri, str):
       uri = atom.http_core.Uri.parse_uri(uri)
 
     # Add the gsession ID to the URL to prevent further redirects.
@@ -639,7 +639,7 @@ class GDClient(atom.client.AtomPubClient):
 
     # If the user passes in a URL, just delete directly, may not work as
     # the service might require an ETag.
-    if isinstance(entry_or_uri, (str, unicode, atom.http_core.Uri)):
+    if isinstance(entry_or_uri, (str, atom.http_core.Uri)):
       return self.request(method='DELETE', uri=entry_or_uri,
                           http_request=http_request, auth_token=auth_token,
                           **kwargs)

@@ -257,7 +257,7 @@ def GenerateOAuthAuthorizationUrl(
       callback_url += '&'
     else:
       callback_url += '?'
-    callback_url += urllib.urlencode({scopes_param_prefix:scopes})  
+    callback_url += urllib.parse.urlencode({scopes_param_prefix:scopes})  
   oauth_token = oauth.OAuthToken(request_token.key, request_token.secret)
   oauth_request = oauth.OAuthRequest.from_token_and_callback(
       token=oauth_token, callback=callback_url,
@@ -336,7 +336,7 @@ def GenerateAuthSubUrl(next, scope, secure=False, session=True,
   else:
     session = 0
 
-  request_params = urllib.urlencode({'next': next, 'scope': scope,
+  request_params = urllib.parse.urlencode({'next': next, 'scope': scope,
                                      'secure': secure, 'session': session, 
                                      'hd': domain})
   if request_url.find('?') == -1:
@@ -385,12 +385,12 @@ def generate_auth_sub_url(next, scopes, secure=False, session=True,
     An atom.url.Url which the user's browser should be directed to in order
     to authorize this application to access their information.
   """
-  if isinstance(next, (str, unicode)):
+  if isinstance(next, str):
     next = atom.url.parse_url(next)
   scopes_string = ' '.join([str(scope) for scope in scopes])
   next.params[scopes_param_prefix] = scopes_string
 
-  if isinstance(request_url, (str, unicode)):
+  if isinstance(request_url, str):
     request_url = atom.url.parse_url(request_url)
   request_url.params['next'] = str(next)
   request_url.params['scope'] = scopes_string
@@ -465,7 +465,7 @@ def extract_auth_sub_token_from_url(url,
     the AuthSubToken defaults to being valid for no scopes. If there was no
     'token' parameter in the URL, this function returns None.
   """
-  if isinstance(url, (str, unicode)):
+  if isinstance(url, str):
     url = atom.url.parse_url(url)
   if 'token' not in url.params:
     return None
@@ -551,7 +551,7 @@ def OAuthTokenFromUrl(url, scopes_param_prefix='oauth_token_scope'):
     the OAuthToken defaults to being valid for no scopes. If there was no
     'oauth_token' parameter in the URL, this function returns None.
   """
-  if isinstance(url, (str, unicode)):
+  if isinstance(url, str):
     url = atom.url.parse_url(url)
   if 'oauth_token' not in url.params:
     return None
@@ -734,12 +734,12 @@ class ClientLoginToken(atom.http_interface.GenericToken):
   def valid_for_scope(self, url):
     """Tells the caller if the token authorizes access to the desired URL.
     """
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, str):
       url = atom.url.parse_url(url)
     for scope in self.scopes:
       if scope == atom.token_store.SCOPE_ALL:
         return True
-      if isinstance(scope, (str, unicode)):
+      if isinstance(scope, str):
         scope = atom.url.parse_url(scope)
       if scope == url:
         return True
@@ -822,7 +822,7 @@ class OAuthToken(atom.http_interface.GenericToken):
           self.key will be None. If oauth_token_secret is not present,
           self.secret will be None.
     """
-    token_params = cgi.parse_qs(token_string, keep_blank_values=False)
+    token_params = urllib.parse.parse_qs(token_string, keep_blank_values=False)
     if 'oauth_token' in token_params:
       self.key = token_params['oauth_token'][0]
     if 'oauth_token_secret' in token_params:

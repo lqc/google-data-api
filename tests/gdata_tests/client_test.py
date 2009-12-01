@@ -28,7 +28,6 @@ import gdata.data
 import atom.mock_http_core
 import io as StringIO
 
-
 class ClientLoginTest(unittest.TestCase):
 
   def test_token_request(self):
@@ -80,7 +79,7 @@ class ClientLoginTest(unittest.TestCase):
     client.http_client = atom.mock_http_core.SettableHttpClient(200, 'OK', 
         'SID=DQAAAGgA...7Zg8CTN\n'
         'LSID=DQAAAGsA...lk8BBbG\n'
-        'Auth=DQAAAGgA...dk3fA5N', {'Content-Type': 'text/plain'})
+        'Auth=DQAAAGgA...dk3fA5N', {'Content-Type': 'text/plain'})    
     client.client_login('me@example.com', 'password', 'wise', 'unit test')
     self.assert_(isinstance(client.auth_token, gdata.gauth.ClientLoginToken))
     self.assertEqual(client.auth_token.token_string, 'DQAAAGgA...dk3fA5N')
@@ -88,7 +87,7 @@ class ClientLoginTest(unittest.TestCase):
 
 class AuthSubTest(unittest.TestCase):
 
-  def test_get_and_upgrade_token(self):
+  def test_get_and_upgrade_token(self):    
     client = gdata.client.GDClient()
     client.http_client = atom.mock_http_core.SettableHttpClient(200, 'OK', 
         'Token=UpgradedTokenVal\n'

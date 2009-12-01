@@ -71,15 +71,15 @@ class AtomPubClient(object):
     # Modify the request based on the AtomPubClient settings and parameters
     # passed in to the request.
     http_request = self.modify_request(http_request)
-    if isinstance(uri, (str, unicode)):
+    if isinstance(uri, str):
       uri = atom.http_core.Uri.parse_uri(uri)
     if uri is not None:
       uri.modify_request(http_request)
-    if isinstance(method, (str, unicode)):
+    if isinstance(method, str):
       http_request.method = method
     # Any unrecognized arguments are assumed to be capable of modifying the
     # HTTP request.
-    for name, value in kwargs.iteritems():
+    for name, value in kwargs.items():
       if value is not None:
         value.modify_request(http_request)
     # Default to an http request if the protocol scheme is not set.

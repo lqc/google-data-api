@@ -60,7 +60,7 @@ class OAuthToken(object):
         self.secret = secret
 
     def to_string(self):
-        return urllib.urlencode({'oauth_token': self.key, 'oauth_token_secret': self.secret})
+        return urllib.parse.urlencode({'oauth_token': self.key, 'oauth_token_secret': self.secret})
 
     # return a token from something like:
     # oauth_token_secret=digg&oauth_token=digg

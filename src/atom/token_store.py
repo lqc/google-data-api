@@ -78,15 +78,17 @@ class TokenStore(object):
     """
     if url is None:
       return None
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, str):
       url = atom.url.parse_url(url)
+    
     if url in self._tokens:
       token = self._tokens[url]
       if token.valid_for_scope(url):
         return token
       else:
         del self._tokens[url]
-    for scope, token in self._tokens.iteritems():
+    
+    for scope, token in self._tokens.items():
       if token.valid_for_scope(url):
         return token
     return atom.http_interface.GenericToken()

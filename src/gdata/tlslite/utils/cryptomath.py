@@ -7,12 +7,20 @@ import math
 import base64
 import binascii
 import hashlib as sha
-import array
 
 # 
 # We don't need the compat stuff anymore, so few updates:
 #  numbits == x.bit_length
 #  numbytes == x.bit_length // 8
+#
+# Instead of array() use bytearray().
+#
+
+def numBytes(n):
+    if n == 0: 
+        return 0
+    # ceil(x.bit_length/8)
+    return n.bit_length //8 + 1*(n.bit_length%8 == 0)  
 
 
 # **************************************************************************
@@ -67,7 +75,7 @@ except ImportError:
 try:
     os.urandom(1)
     def getRandomBytes(howMany):
-        return stringToBytes(os.urandom(howMany))
+        return bytearray(os.urandom(howMany))
     prngName = "os.urandom"
 
 except:
@@ -80,7 +88,7 @@ except:
                                           cryptlib_py.CRYPT_CTXINFO_MODE,
                                           cryptlib_py.CRYPT_MODE_OFB)
             cryptlib_py.cryptGenerateKey(randomKey)
-            bytes = array.array('B', [0] * howMany)
+            bytes = bytearray(howMany)
             cryptlib_py.cryptEncrypt(randomKey, bytes)
             return bytes
         prngName = "cryptlib"
@@ -90,7 +98,7 @@ except:
         try:
             devRandomFile = open("/dev/urandom", "rb")
             def getRandomBytes(howMany):
-                return array.array('B', devRandomFile.read(howMany))
+                return bytearray( devRandomFile.read(howMany) )
             prngName = "/dev/urandom"
         except IOError:
             #Else get Win32 CryptoAPI PRNG
@@ -100,7 +108,7 @@ except:
                     s = win32prng.getRandomBytes(howMany)
                     if len(s) != howMany:
                         raise AssertionError()
-                    return array.array('B', s)
+                    return bytearray(s)
                 prngName ="CryptoAPI"
             except ImportError:
                 #Else no PRNG :-(
@@ -113,7 +121,7 @@ except:
 # Converter Functions
 # **************************************************************************
 
-def arrayToNumber(a):
+def numberFromBytes(a):
     total = 0
     multiplier = 1
     for count in range(len(a)-1, -1, -1):
@@ -122,80 +130,56 @@ def arrayToNumber(a):
         multiplier *= 256
     return total
 
-def numberToArray(n):
+def bytesOfNumber(n):
     howManyBytes = numBytes(n)
-    a = array.array('B', [0]*howManyBytes)
+    
     for count in range(howManyBytes-1, -1, -1):
-        a[count] = int(n % 256)
+        yield (n % 256)
         n >>= 8
-    return a
-
-def arrayToBase64(ba):
-    s = arrayToBytes(ba)
-    return bytesToBase64(s)
-
-def base64ToArray(s):
-    s = base64ToBytes(s)
-    return bytesToArray(s)
-
-def numberToBase64(n):
-    a = numberToArray(n)
-    return arrayToBase64(a)
-
-def base64ToNumber(s):
-    a = base64ToArray(s)
-    return bytesToNumber(a)
-
-def bytesToNumber(s):
-    a = bytesToArray(s)
-    return arrayToNumber(a)
-
-def numberToString(s):
-    a = numberToArray(s)
-    return arrayToBytes(a)
+    raise StopIteration
 
 def base64ToBytes(s):
     try:
-        return base64.decodestring(s)
+        return base64.decodebytes(s)
     except binascii.Error as e:
         raise SyntaxError(e)
     except binascii.Incomplete as e:
         raise SyntaxError(e)
 
 def bytesToBase64(s):
-    return base64.encodestring(s).replace("\n", "")
+    return base64.encodebytes(s).replace("\n", "")
+
+def numberToBase64(n):
+    return bytesToBase64( bytesOfNumber(n) )
+
+def base64ToNumber(bstr):
+    return numberFromBytes( base64ToBytes(bstr) )
 
 def mpiToNumber(mpi): #mpi is an openssl-format bignum string
     if (ord(mpi[4]) & 0x80) !=0: #Make sure this is a positive number
-        raise AssertionError()
-    bytes = bytesToArray(mpi[4:])
-    return bytesToNumber(bytes)
+        raise AssertionError()    
+    return numberFromBytes(mpi[4:])
 
 def numberToMPI(n):
-    bytes = numberToArray(n)
+    ba = bytearray(bytesOfNumber(n))
     ext = 0
     #If the high-order bit is going to be set,
     #add an extra byte of zeros
     if (n.bit_length & 0x7)==0:
         ext = 1
     length = numBytes(n) + ext
-    bytes = concatArrays(createByteArrayZeros(4+ext), bytes)
-    bytes[0] = (length >> 24) & 0xFF
-    bytes[1] = (length >> 16) & 0xFF
-    bytes[2] = (length >> 8) & 0xFF
-    bytes[3] = length & 0xFF
-    return bytesToString(bytes)
+    ba = bytearray(4+ext) + ba
+    ba[0] = (length >> 24) & 0xFF
+    ba[1] = (length >> 16) & 0xFF
+    ba[2] = (length >> 8) & 0xFF
+    ba[3] = length & 0xFF
+    return ba # no need to make it immutable now
 
 
 
 # **************************************************************************
 # Misc. Utility Functions
 # **************************************************************************
-
-def numBytes(n):
-    if n==0:
-        return 0
-    return n.bit_length // 8
 
 def hashAndBase64(s):
     return bytesToBase64(sha.sha(s).digest())
@@ -214,13 +198,13 @@ def getRandomNumber(low, high):
     if low >= high:
         raise AssertionError()
     howManyBits = high.bit_length
-    howManyBytes = high.bit_length // 8
+    howManyBytes = numBytes(high)
     lastBits = howManyBits % 8
     while 1:
-        bytes = getRandomBytes(howManyBytes)
+        ba = getRandomBytes(howManyBytes)
         if lastBits:
-            bytes[0] = bytes[0] % (1 << lastBits)
-        n = bytesToNumber(bytes)
+            ba[0] = ba[0] % (1 << lastBits)
+        n = numberFromBytes(ba)
         if n >= low and n < high:
             return n
 

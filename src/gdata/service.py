@@ -1525,9 +1525,9 @@ def GenerateAuthSubRequestUrl(next, scopes, hd='default', secure=False,
     scope = scopes
   if include_scopes_in_next:
     if next.find('?') > -1:
-      next += '&%s' % urllib.urlencode({SCOPE_URL_PARAM_NAME:scope})
+      next += '&%s' % urllib.parse.urlencode({SCOPE_URL_PARAM_NAME:scope})
     else:
-      next += '?%s' % urllib.urlencode({SCOPE_URL_PARAM_NAME:scope})
+      next += '?%s' % urllib.parse.urlencode({SCOPE_URL_PARAM_NAME:scope})
   return gdata.auth.GenerateAuthSubUrl(next=next, scope=scope, secure=secure,
       session=session, request_url=request_url, domain=hd)
 

@@ -1230,7 +1230,7 @@ NICK_ENTRY = b"""<?xml version="1.0" encoding="UTF-8"?>
   <apps:login userName="TestUser"/>
 </atom:entry>"""
 
-NICK_FEED= b"""""<?xml version="1.0" encoding="UTF-8"?>
+NICK_FEED = b"""<?xml version="1.0" encoding="UTF-8"?>
 <atom:feed xmlns:atom="http://www.w3.org/2005/Atom"
   xmlns:openSearch="http://a9.com/-/spec/opensearchrss/1.0/"
   xmlns:apps="http://schemas.google.com/apps/2006">

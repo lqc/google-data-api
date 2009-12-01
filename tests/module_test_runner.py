@@ -41,7 +41,7 @@ class ModuleTestRunner(object):
     It also sets any module variables which match the settings keys to the
     corresponding values in the settings member.
     """
-    runner = unittest.TextTestRunner()
+    runner = unittest.TextTestRunner(verbosity=2)
     for module in self.modules:
       # Set any module variables according to the contents in the settings
       for setting, value in self.settings.items():

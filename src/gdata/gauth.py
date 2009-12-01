@@ -47,6 +47,7 @@ ae_save
 import time
 import random
 import urllib
+import urllib.parse
 import atom.http_core
 
 
@@ -99,7 +100,7 @@ def generate_client_login_request_body(email, password, service, source,
     # user is responding to a captch challenge.
     request_fields['logintoken'] = captcha_token
     request_fields['logincaptcha'] = captcha_response
-  return urllib.urlencode(request_fields)
+  return urllib.parse.urlencode(request_fields)
 
 
 GenerateClientLoginRequestBody = generate_client_login_request_body
@@ -184,7 +185,7 @@ class ClientLoginToken(object):
 
 # AuthSub functions and classes.
 def _to_uri(str_or_uri):
-  if isinstance(str_or_uri, (str, unicode)):
+  if isinstance(str_or_uri, str):
     return atom.http_core.Uri.parse_uri(str_or_uri)
   return str_or_uri
 
@@ -232,12 +233,12 @@ def generate_auth_sub_url(next, scopes, secure=False, session=True,
     An atom.http_core.Uri which the user's browser should be directed to in
     order to authorize this application to access their information.
   """
-  if isinstance(next, (str, unicode)):
+  if isinstance(next, str):
     next = atom.http_core.Uri.parse_uri(next)
   scopes_string = ' '.join([str(scope) for scope in scopes])
   next.query[scopes_param_prefix] = scopes_string
 
-  if isinstance(request_url, (str, unicode)):
+  if isinstance(request_url, str):
     request_url = atom.http_core.Uri.parse_uri(request_url)
   request_url.query['next'] = str(next)
   request_url.query['scope'] = scopes_string
@@ -278,7 +279,7 @@ def auth_sub_string_from_url(url, scopes_param_prefix='auth_sub_scopes'):
     None. If there was no token param in the url, the tuple returned is
     (None, None)
   """
-  if isinstance(url, (str, unicode)):
+  if isinstance(url, str):
     url = atom.http_core.Uri.parse_uri(url)
   if 'token' not in url.query:
     return (None, None)
@@ -489,10 +490,10 @@ def build_oauth_base_string(http_request, consumer_key, nonce, signaure_type,
   sorted_keys = sorted(params.keys())
   pairs = []
   for key in sorted_keys:
-    pairs.append('%s=%s' % (urllib.quote(key, safe='~'),
-                            urllib.quote(params[key], safe='~')))
+    pairs.append('%s=%s' % (urllib.parse.quote(key, safe='~'),
+                            urllib.parse.quote(params[key], safe='~')))
   # We want to escape /'s too, so use safe='~'
-  all_parameters = urllib.quote('&'.join(pairs), safe='~')
+  all_parameters = urllib.parse.quote('&'.join(pairs), safe='~')
   normailzed_host = http_request.uri.host.lower()
   normalized_scheme = (http_request.uri.scheme or 'http').lower()
   non_default_port = None
@@ -507,12 +508,12 @@ def build_oauth_base_string(http_request, consumer_key, nonce, signaure_type,
   if non_default_port is not None:
     # Set the only safe char in url encoding to ~ since we want to escape /
     # as well.
-    request_path = urllib.quote('%s://%s:%s%s' % (
+    request_path = urllib.parse.quote('%s://%s:%s%s' % (
         normalized_scheme, normailzed_host, non_default_port, path), safe='~')
   else:
     # Set the only safe char in url encoding to ~ since we want to escape /
     # as well.
-    request_path = urllib.quote('%s://%s%s' % (
+    request_path = urllib.parse.quote('%s://%s%s' % (
         normalized_scheme, normailzed_host, path), safe='~')
   # TODO: ensure that token escaping logic is correct, not sure if the token
   # value should be double escaped instead of single.
@@ -533,10 +534,10 @@ def generate_hmac_signature(http_request, consumer_key, consumer_secret,
   hash_key = None
   hashed = None
   if token_secret is not None:
-    hash_key = '%s&%s' % (urllib.quote(consumer_secret, safe='~'),
-                          urllib.quote(token_secret, safe='~'))
+    hash_key = '%s&%s' % (urllib.parse.quote(consumer_secret, safe='~'),
+                          urllib.parse.quote(token_secret, safe='~'))
   else:
-    hash_key = '%s&' % urllib.quote(consumer_secret, safe='~')
+    hash_key = '%s&' % urllib.parse.quote(consumer_secret, safe='~')
   try:
     import hashlib
     hashed = hmac.new(hash_key, base_string, hashlib.sha1)
@@ -642,7 +643,7 @@ def generate_request_for_request_token(
     request.uri.query['scope'] = ' '.join(scopes)
 
   timestamp = str(int(time.time()))
-  nonce = ''.join([str(random.randint(0, 9)) for i in xrange(15)])
+  nonce = ''.join([str(random.randint(0, 9)) for i in range(15)])
   signature = None
   if signature_type == HMAC_SHA1:
     signature = generate_hmac_signature(
@@ -767,7 +768,7 @@ def oauth_token_info_from_url(url):
     A tuple of strings containing the OAuth token and the OAuth verifier which
     need to sent when upgrading a request token to an access token.
   """
-  if isinstance(url, (str, unicode)):
+  if isinstance(url, str):
     url = atom.http_core.Uri.parse_uri(url)
   token = None
   verifier = None

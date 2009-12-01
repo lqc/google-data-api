@@ -20,9 +20,7 @@
 
 __author__ = 'j.s@google.com (Jeff Scudder)'
 
-
 import base64
-
 
 class BasicAuth(object):
   """Sets the Authorization header as defined in RFC1945"""

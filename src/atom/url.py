@@ -100,39 +100,18 @@ class Url(object):
       return '?'.join([self.path, param_string])
     else:
       return self.path
+  
+  def _tuple(self):
+      return tuple( (self.protocol or DEFAULT_PROTOCOL, self.host, self.port or DEFAULT_PORT, self.path, tuple(self.params.items()) ) )
 
-  def __cmp__(self, other):
+  def __eq__(self, other):
     if not isinstance(other, Url):
-      return cmp(self.to_string(), str(other))
-    difference = 0
-    # Compare the protocol
-    if self.protocol and other.protocol:
-      difference = cmp(self.protocol, other.protocol)
-    elif self.protocol and not other.protocol:
-      difference = cmp(self.protocol, DEFAULT_PROTOCOL)
-    elif not self.protocol and other.protocol:
-      difference = cmp(DEFAULT_PROTOCOL, other.protocol)
-    if difference != 0:
-      return difference
-    # Compare the host
-    difference = cmp(self.host, other.host)
-    if difference != 0:
-      return difference
-    # Compare the port
-    if self.port and other.port:
-      difference = cmp(self.port, other.port)
-    elif self.port and not other.port:
-      difference = cmp(self.port, DEFAULT_PORT)
-    elif not self.port and other.port:
-      difference = cmp(DEFAULT_PORT, other.port)
-    if difference != 0:
-      return difference
-    # Compare the path
-    difference = cmp(self.path, other.path)
-    if difference != 0:
-      return difference
-    # Compare the parameters
-    return cmp(self.params, other.params)
+      return self.to_string() == str(other)
+  
+    return self._tuple() == other._tuple()
+
+  def __hash__(self):
+    return hash(self._tuple())    
 
   def __str__(self):
     return self.to_string()

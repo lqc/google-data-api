@@ -167,14 +167,14 @@ class Python_RSAKey(RSAKey):
         version = privateKeyP.getChild(0).value[0]
         if version != 0:
             raise SyntaxError("Unrecognized RSAPrivateKey version")
-        n = bytesToNumber(privateKeyP.getChild(1).value)
-        e = bytesToNumber(privateKeyP.getChild(2).value)
-        d = bytesToNumber(privateKeyP.getChild(3).value)
-        p = bytesToNumber(privateKeyP.getChild(4).value)
-        q = bytesToNumber(privateKeyP.getChild(5).value)
-        dP = bytesToNumber(privateKeyP.getChild(6).value)
-        dQ = bytesToNumber(privateKeyP.getChild(7).value)
-        qInv = bytesToNumber(privateKeyP.getChild(8).value)
+        n = numberFromBytes(privateKeyP.getChild(1).value)
+        e = numberFromBytes(privateKeyP.getChild(2).value)
+        d = numberFromBytes(privateKeyP.getChild(3).value)
+        p = numberFromBytes(privateKeyP.getChild(4).value)
+        q = numberFromBytes(privateKeyP.getChild(5).value)
+        dP = numberFromBytes(privateKeyP.getChild(6).value)
+        dQ = numberFromBytes(privateKeyP.getChild(7).value)
+        qInv = numberFromBytes(privateKeyP.getChild(8).value)
         return Python_RSAKey(n, e, d, p, q, dP, dQ, qInv)
     _parseASN1PrivateKey = staticmethod(_parseASN1PrivateKey)
 

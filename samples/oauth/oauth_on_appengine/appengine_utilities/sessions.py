@@ -306,7 +306,7 @@ class _DatastoreWriter(object):
             del(session.cookie_vals[keyname])
             session.output_cookie[session.cookie_name + '_data'] = \
                 simplejson.dumps(session.cookie_vals)
-            print session.output_cookie.output()
+            print(session.output_cookie.output())
 
         sessdata = session._get(keyname=keyname)
         if sessdata is None:
@@ -340,7 +340,7 @@ class _CookieWriter(object):
         session.cache[keyname] = value
         session.output_cookie[session.cookie_name + '_data'] = \
             simplejson.dumps(session.cookie_vals)
-        print session.output_cookie.output()
+        print(session.output_cookie.output())
 
 class Session(object):
     """
@@ -506,7 +506,7 @@ class Session(object):
                 self.output_cookie[cookie_name + '_data'] = ""
             self.output_cookie[cookie_name + '_data']['expires'] = \
                 self.session_expire_time
-        print self.output_cookie.output()
+        print(self.output_cookie.output())
 
         # fire up a Flash object if integration is enabled
         if self.integrate_flash:
@@ -588,7 +588,7 @@ class Session(object):
         elif keyname in ('sid', 'flash'):
             raise ValueError(keyname + ' is a reserved keyname.')
 
-        if type(keyname) != type([str, unicode]):
+        if not isinstance(keyname, str):
             return str(keyname)
         return keyname
 
@@ -617,7 +617,7 @@ class Session(object):
         self.cache = {}
         self.output_cookie[self.cookie_name + '_data'] = \
             simplejson.dumps(self.cookie_vals)
-        print self.output_cookie.output()
+        print(self.output_cookie.output())
         """
         OLD
         if hasattr(self, "session"):
@@ -778,7 +778,7 @@ class Session(object):
             bad_key = False
             self.output_cookie[self.cookie_name + '_data'] = \
                 simplejson.dumps(self.cookie_vals)
-            print self.output_cookie.output()
+            print(self.output_cookie.output())
         if bad_key:
             raise KeyError(str(keyname))
         if keyname in self.cache:
@@ -872,11 +872,11 @@ class Session(object):
         Adds headers, avoiding any page caching in the browser. Useful for highly
         dynamic sites.
         """
-        print "Expires: Tue, 03 Jul 2001 06:00:00 GMT"
-        print strftime("Last-Modified: %a, %d %b %y %H:%M:%S %Z")
-        print "Cache-Control: no-store, no-cache, must-revalidate, max-age=0"
-        print "Cache-Control: post-check=0, pre-check=0"
-        print "Pragma: no-cache"
+        print( "Expires: Tue, 03 Jul 2001 06:00:00 GMT")
+        print( strftime("Last-Modified: %a, %d %b %y %H:%M:%S %Z"))
+        print( "Cache-Control: no-store, no-cache, must-revalidate, max-age=0")
+        print( "Cache-Control: post-check=0, pre-check=0")
+        print( "Pragma: no-cache")
 
     def clear(self):
         """
@@ -892,7 +892,7 @@ class Session(object):
         self.cookie_vals = {}
         self.output_cookie[self.cookie_name + '_data'] = \
             simplejson.dumps(self.cookie_vals)
-        print self.output_cookie.output()
+        print( self.output_cookie.output())
 
     def has_key(self, keyname):
         """
@@ -996,5 +996,5 @@ class Session(object):
                     output_cookie = Cookie.SimpleCookie()
                     output_cookie[cookie_name] = cookie[cookie_name]
                     output_cookie[cookie_name]['expires'] = 0
-                    print output_cookie.output()
+                    print( output_cookie.output())
         return False

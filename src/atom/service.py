@@ -142,7 +142,7 @@ class AtomService(object):
   #@atom.v1_deprecated('Please use atom.client.AtomPubClient for requests.')
   def request(self, operation, url, data=None, headers=None, 
       url_params=None):
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, str):
       if url.startswith('http:') and self.ssl:
         # Force all requests to be https if self.ssl is True.
         url = atom.url.parse_url('https:' + url[5:])
@@ -338,12 +338,12 @@ class BasicAuthToken(atom.http_interface.GenericToken):
   def valid_for_scope(self, url):
     """Tells the caller if the token authorizes access to the desired URL.
     """
-    if isinstance(url, (str, unicode)):
+    if isinstance(url, str):
       url = atom.url.parse_url(url)
     for scope in self.scopes:
       if scope == atom.token_store.SCOPE_ALL:
         return True
-      if isinstance(scope, (str, unicode)):
+      if isinstance(scope, str):
         scope = atom.url.parse_url(scope)
       if scope == url:
         return True

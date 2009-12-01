@@ -788,12 +788,12 @@ class UtfParsingTest(unittest.TestCase):
 
   def testMemberStringEncoding(self):
     atom_entry = atom.core.parse(self.test_xml, atom.data.Entry)
-    self.assert_(isinstance(atom_entry.title.type, unicode))
-    self.assertEqual(atom_entry.title.type, u'\u03B1\u03BB\u03C6\u03B1')
-    self.assertEqual(atom_entry.title.text, u'\u03B1\u03BB\u03C6\u03B1')
+    self.assert_(isinstance(atom_entry.title.type, str))
+    self.assertEqual(atom_entry.title.type, '\u03B1\u03BB\u03C6\u03B1')
+    self.assertEqual(atom_entry.title.text, '\u03B1\u03BB\u03C6\u03B1')
 
     # Setting object members to unicode strings is supported.
-    atom_entry.title.type = u'\u03B1\u03BB\u03C6\u03B1'
+    atom_entry.title.type = '\u03B1\u03BB\u03C6\u03B1'
     xml = atom_entry.ToString()
     # The unicode code points should be converted to XML escaped sequences.
     self.assert_('&#945;&#955;&#966;&#945;' in xml)

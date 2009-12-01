@@ -49,4 +49,8 @@ def RunAllTests():
   test_runner.RunAllTests()
   
 if __name__ == '__main__':
-  RunAllTests()
+    try:
+        RunAllTests()
+    except BaseException as e:
+        print(e)
+        

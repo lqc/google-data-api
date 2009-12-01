@@ -75,7 +75,7 @@ class XmlElement(object):
       if not pair[0].startswith('_') and pair[0] != 'text':
         member_type = pair[1]
         if (isinstance(member_type, tuple) or isinstance(member_type, list)
-            or isinstance(member_type, basestring)
+            or isinstance(member_type, str)
             or (inspect.isclass(member_type)
                 and issubclass(member_type, XmlElement))):
           members.append(pair)
@@ -155,7 +155,7 @@ class XmlElement(object):
             attributes[target[version-1]] = member_name
           else:
             attributes[target[-1]] = member_name
-        elif isinstance(target, (str, unicode)):
+        elif isinstance(target, str):
           # This member points to an XML attribute.
           attributes[target] = member_name
         elif issubclass(target, XmlElement):
@@ -189,7 +189,7 @@ class XmlElement(object):
     matches = []
     ignored1, elements, ignored2 = self.__class__._get_rules(version)
     if elements:
-      for qname, element_def in elements.iteritems():
+      for qname, element_def in elements.items():
         member = getattr(self, element_def[0])
         if member:
           if _qname_matches(tag, namespace, qname):
@@ -235,7 +235,7 @@ class XmlElement(object):
     matches = []
     ignored1, ignored2, attributes = self.__class__._get_rules(version)
     if attributes:
-      for qname, attribute_def in attributes.iteritems():
+      for qname, attribute_def in attributes.items():
         if isinstance(attribute_def, (list, tuple)):
           attribute_def = attribute_def[0]
         member = getattr(self, attribute_def)
@@ -244,7 +244,7 @@ class XmlElement(object):
         if member:
           if _qname_matches(tag, namespace, qname):
             matches.append(XmlAttribute(qname, member))
-    for qname, value in self._other_attributes.iteritems():
+    for qname, value in self._other_attributes.items():
       if _qname_matches(tag, namespace, qname):
         matches.append(XmlAttribute(qname, value))
     return matches
@@ -270,7 +270,7 @@ class XmlElement(object):
       else:
         self._other_elements.append(_xml_element_from_tree(element, XmlElement,
                                                            version))
-    for attrib, value in tree.attrib.iteritems():
+    for attrib, value in tree.attrib.items():
       if attributes and attrib in attributes:
         setattr(self, attributes[attrib], value)
       else:
@@ -298,7 +298,7 @@ class XmlElement(object):
     qname, elements, attributes = self.__class__._get_rules(version)    
     # Add the expected elements and attributes to the tree.
     if elements:
-      for tag, element_def in elements.iteritems():
+      for tag, element_def in elements.items():
         member = getattr(self, element_def[0])
         # If this is a repeating element and there are members in the list.
         if member and element_def[2]:
@@ -307,7 +307,7 @@ class XmlElement(object):
         elif member:
           member._become_child(tree, version)
     if attributes:
-      for attribute_tag, member_name in attributes.iteritems():
+      for attribute_tag, member_name in attributes.items():
         value = getattr(self, member_name)
         if value:
           tree.attrib[attribute_tag] = value
@@ -334,9 +334,8 @@ class XmlElement(object):
 
   def _become_child(self, tree, version=1):
     """Adds a child element to tree with the XML data in self."""
-    new_child = ElementTree.Element('')
-    tree.append(new_child)
-    new_child.tag = _get_qname(self, version)
+    new_child = ElementTree.Element( _get_qname(self, version) )
+    tree.append(new_child) 
     self._attach_members(new_child, version)
 
   def __get_extension_elements(self):
