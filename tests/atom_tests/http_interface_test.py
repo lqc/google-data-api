@@ -20,27 +20,27 @@ __author__ = 'api.jscudder (Jeff Scudder)'
 
 import unittest
 import atom.http_interface
-import io as StringIO
+import io
 
 
 class HttpResponseTest(unittest.TestCase):
 
   def testConstructorWithStrings(self):
-    resp = atom.http_interface.HttpResponse(body='Hi there!', status=200, 
-        reason='OK', headers={'Content-Length':'9'})
-    self.assertEqual(resp.read(amt=1), 'H')
-    self.assertEqual(resp.read(amt=2), 'i ')
-    self.assertEqual(resp.read(), 'there!')
-    self.assertEqual(resp.read(), '')
+    resp = atom.http_interface.HttpResponse(body = b'Hi there!', status = 200,
+        reason = 'OK', headers = {'Content-Length':'9'})
+    self.assertEqual(resp.read(amt = 1), b'H')
+    self.assertEqual(resp.read(amt = 2), b'i ')
+    self.assertEqual(resp.read(), b'there!')
+    self.assertEqual(resp.read(), b'')
     self.assertEqual(resp.reason, 'OK')
     self.assertEqual(resp.status, 200)
     self.assertEqual(resp.getheader('Content-Length'), '9')
     self.assert_(resp.getheader('Missing') is None)
-    self.assertEqual(resp.getheader('Missing', default='yes'), 'yes')
+    self.assertEqual(resp.getheader('Missing', default = 'yes'), 'yes')
 
 
 def suite():
-  return unittest.TestSuite((unittest.makeSuite(HttpResponseTest,'test'),))
+  return unittest.TestSuite((unittest.makeSuite(HttpResponseTest, 'test'),))
 
 
 if __name__ == '__main__':

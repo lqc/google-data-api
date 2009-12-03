@@ -22,7 +22,7 @@ import unittest
 
 class ModuleTestRunner(object):
 
-  def __init__(self, module_list=None, module_settings=None):
+  def __init__(self, module_list = None, module_settings = None):
     """Constructor for a runner to run tests in the modules listed.
 
     Args:
@@ -41,7 +41,7 @@ class ModuleTestRunner(object):
     It also sets any module variables which match the settings keys to the
     corresponding values in the settings member.
     """
-    runner = unittest.TextTestRunner(verbosity=2)
+    runner = unittest.TextTestRunner(verbosity = 0)
     for module in self.modules:
       # Set any module variables according to the contents in the settings
       for setting, value in self.settings.items():
@@ -54,4 +54,4 @@ class ModuleTestRunner(object):
       # We have set all of the applicable settings for the module, now
       # run the tests.
       print('\nRunning all tests in module', module.__name__)
-      runner.run(unittest.defaultTestLoader.loadTestsFromModule(module))    
+      runner.run(unittest.defaultTestLoader.loadTestsFromModule(module))

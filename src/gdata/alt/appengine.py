@@ -32,7 +32,7 @@ run_on_appengine: Function which will modify an existing GDataService object
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-import StringIO
+import io
 import pickle
 import atom.http_interface
 import atom.token_store
@@ -42,8 +42,8 @@ from google.appengine.api import users
 from google.appengine.api import memcache
 
 
-def run_on_appengine(gdata_service, store_tokens=True, 
-    single_user_mode=False):
+def run_on_appengine(gdata_service, store_tokens = True,
+    single_user_mode = False):
   """Modifies a GDataService object to allow it to run on App Engine.
 
   Args:
@@ -77,11 +77,11 @@ def run_on_appengine(gdata_service, store_tokens=True,
 
 
 class AppEngineHttpClient(atom.http_interface.GenericHttpClient):
-  def __init__(self, headers=None):
+  def __init__(self, headers = None):
     self.debug = False
     self.headers = headers or {}
 
-  def request(self, operation, url, data=None, headers=None):
+  def request(self, operation, url, data = None, headers = None):
     """Performs an HTTP call to the server, supports GET, POST, PUT, and
     DELETE.
 
@@ -140,8 +140,8 @@ class AppEngineHttpClient(atom.http_interface.GenericHttpClient):
       method = urlfetch.DELETE
     else:
       method = None
-    return HttpResponse(urlfetch.Fetch(url=str(url), payload=data_str,
-        method=method, headers=all_headers, follow_redirects=False))
+    return HttpResponse(urlfetch.Fetch(url = str(url), payload = data_str,
+        method = method, headers = all_headers, follow_redirects = False))
 
 
 def _convert_data_part(data):
@@ -163,12 +163,12 @@ class HttpResponse(object):
   """
 
   def __init__(self, urlfetch_response):
-    self.body = StringIO.StringIO(urlfetch_response.content)
+    self.body = io.BytesIO(urlfetch_response.content)
     self.headers = urlfetch_response.headers
     self.status = urlfetch_response.status_code
     self.reason = ''
 
-  def read(self, length=None):
+  def read(self, length = None):
     if not length:
       return self.body.read()
     else:
@@ -264,7 +264,7 @@ class AppEngineTokenStore(atom.token_store.TokenStore):
     save_auth_tokens({}, self.user)
 
 
-def save_auth_tokens(token_dict, user=None):
+def save_auth_tokens(token_dict, user = None):
   """Associates the tokens with the current user and writes to the datastore.
   
   If there us no current user, the tokens are not written and this function
@@ -285,12 +285,12 @@ def save_auth_tokens(token_dict, user=None):
     return user_tokens.put()
   else:
     user_tokens = TokenCollection(
-        user=user, 
-        pickled_tokens=pickle.dumps(token_dict))
+        user = user,
+        pickled_tokens = pickle.dumps(token_dict))
     return user_tokens.put()
-     
 
-def load_auth_tokens(user=None):
+
+def load_auth_tokens(user = None):
   """Reads a dictionary of the current user's tokens from the datastore.
   
   If there is no current user (a user is not signed in to the app) or the user

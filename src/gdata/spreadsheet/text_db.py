@@ -15,7 +15,7 @@
 # limitations under the License.
 
 
-import StringIO
+import io
 import gdata
 import gdata.service
 import gdata.spreadsheet
@@ -90,7 +90,7 @@ class DatabaseClient(object):
   Google Documents List API. 
   """
 
-  def __init__(self, username=None, password=None):
+  def __init__(self, username = None, password = None):
     """Constructor for a Database Client. 
   
     If the username and password are present, the constructor  will contact
@@ -128,7 +128,7 @@ class DatabaseClient(object):
                             'DisplayUnlockCaptcha to unlock your account.')
       except gdata.service.BadAuthentication:
         raise BadCredentials('Username or password incorrect.')
-    
+
   def CreateDatabase(self, name):
     """Creates a new Google Spreadsheet with the desired name.
 
@@ -141,12 +141,12 @@ class DatabaseClient(object):
     # Create a Google Spreadsheet to form the foundation of this database.
     # Spreadsheet is created by uploading a file to the Google Documents
     # List API.
-    virtual_csv_file = StringIO.StringIO(',,,')
-    virtual_media_source = gdata.MediaSource(file_handle=virtual_csv_file, content_type='text/csv', content_length=3)
+    virtual_csv_file = io.BytesIO(b',,,')
+    virtual_media_source = gdata.MediaSource(file_handle = virtual_csv_file, content_type = 'text/csv', content_length = 3)
     db_entry = self.__docs_client.UploadSpreadsheet(virtual_media_source, name)
-    return Database(spreadsheet_entry=db_entry, database_client=self)
+    return Database(spreadsheet_entry = db_entry, database_client = self)
 
-  def GetDatabases(self, spreadsheet_key=None, name=None):
+  def GetDatabases(self, spreadsheet_key = None, name = None):
     """Finds spreadsheets which have the unique key or title.
 
     If querying on the spreadsheet_key there will be at most one result, but
@@ -163,17 +163,17 @@ class DatabaseClient(object):
     if spreadsheet_key:
       db_entry = self.__docs_client.GetDocumentListEntry(
           r'/feeds/documents/private/full/spreadsheet%3A' + spreadsheet_key)
-      return [Database(spreadsheet_entry=db_entry, database_client=self)]
+      return [Database(spreadsheet_entry = db_entry, database_client = self)]
     else:
       title_query = gdata.docs.service.DocumentQuery()
       title_query['title'] = name
       db_feed = self.__docs_client.QueryDocumentListFeed(title_query.ToUri())
       matching_databases = []
       for entry in db_feed.entry:
-        matching_databases.append(Database(spreadsheet_entry=entry, 
-                                           database_client=self))
+        matching_databases.append(Database(spreadsheet_entry = entry,
+                                           database_client = self))
       return matching_databases
-    
+
   def _GetDocsClient(self):
     return self.__docs_client
 
@@ -187,7 +187,7 @@ class Database(object):
   The database represents a Google Spreadsheet.
   """
 
-  def __init__(self, spreadsheet_entry=None, database_client=None):
+  def __init__(self, spreadsheet_entry = None, database_client = None):
     """Constructor for a database object.
 
     Args:
@@ -205,7 +205,7 @@ class Database(object):
       self.spreadsheet_key = id_parts[-1].replace('spreadsheet%3A', '')
     self.client = database_client
 
-  def CreateTable(self, name, fields=None):
+  def CreateTable(self, name, fields = None):
     """Add a new worksheet to this spreadsheet and fill in column names.
 
     Args:
@@ -219,13 +219,13 @@ class Database(object):
     Returns:
       Table representing the newly created worksheet.
     """
-    worksheet = self.client._GetSpreadsheetsClient().AddWorksheet(title=name,
-        row_count=1, col_count=len(fields), key=self.spreadsheet_key)
-    return Table(name=name, worksheet_entry=worksheet, 
-        database_client=self.client, 
-        spreadsheet_key=self.spreadsheet_key, fields=fields)
+    worksheet = self.client._GetSpreadsheetsClient().AddWorksheet(title = name,
+        row_count = 1, col_count = len(fields), key = self.spreadsheet_key)
+    return Table(name = name, worksheet_entry = worksheet,
+        database_client = self.client,
+        spreadsheet_key = self.spreadsheet_key, fields = fields)
 
-  def GetTables(self, worksheet_id=None, name=None):
+  def GetTables(self, worksheet_id = None, name = None):
     """Searches for a worksheet with the specified ID or name.
 
     The list of results should have one table at most, or no results
@@ -241,23 +241,23 @@ class Database(object):
     """
     if worksheet_id:
       worksheet_entry = self.client._GetSpreadsheetsClient().GetWorksheetsFeed(
-          self.spreadsheet_key, wksht_id=worksheet_id)
-      return [Table(name=worksheet_entry.title.text, 
-          worksheet_entry=worksheet_entry, database_client=self.client, 
-          spreadsheet_key=self.spreadsheet_key)]
+          self.spreadsheet_key, wksht_id = worksheet_id)
+      return [Table(name = worksheet_entry.title.text,
+          worksheet_entry = worksheet_entry, database_client = self.client,
+          spreadsheet_key = self.spreadsheet_key)]
     else:
       matching_tables = []
       query = None
       if name:
         query = gdata.spreadsheet.service.DocumentQuery()
         query.title = name
- 
+
       worksheet_feed = self.client._GetSpreadsheetsClient().GetWorksheetsFeed(
-          self.spreadsheet_key, query=query)
+          self.spreadsheet_key, query = query)
       for entry in worksheet_feed.entry:
-        matching_tables.append(Table(name=entry.title.text, 
-            worksheet_entry=entry, database_client=self.client, 
-            spreadsheet_key=self.spreadsheet_key))
+        matching_tables.append(Table(name = entry.title.text,
+            worksheet_entry = entry, database_client = self.client,
+            spreadsheet_key = self.spreadsheet_key))
       return matching_tables
 
   def Delete(self):
@@ -270,8 +270,8 @@ class Database(object):
 
 class Table(object):
 
-  def __init__(self, name=None, worksheet_entry=None, database_client=None, 
-      spreadsheet_key=None, fields=None):
+  def __init__(self, name = None, worksheet_entry = None, database_client = None,
+      spreadsheet_key = None, fields = None):
     self.name = name
     self.entry = worksheet_entry
     id_parts = worksheet_entry.id.text.split('/')
@@ -294,20 +294,20 @@ class Table(object):
       query.max_row = '1'
       query.min_row = '1'
       feed = self.client._GetSpreadsheetsClient().GetCellsFeed(
-          self.spreadsheet_key, wksht_id=self.worksheet_id, query=query)
+          self.spreadsheet_key, wksht_id = self.worksheet_id, query = query)
       for entry in feed.entry:
         first_row_contents.append(entry.content.text)
       # Get the next set of cells if needed.
       next_link = feed.GetNextLink()
       while next_link:
-        feed = self.client._GetSpreadsheetsClient().Get(next_link.href, 
-            converter=gdata.spreadsheet.SpreadsheetsCellsFeedFromString)
+        feed = self.client._GetSpreadsheetsClient().Get(next_link.href,
+            converter = gdata.spreadsheet.SpreadsheetsCellsFeedFromString)
         for entry in feed.entry:
           first_row_contents.append(entry.content.text)
         next_link = feed.GetNextLink()
       # Convert the contents of the cells to valid headers.
       self.fields = ConvertStringsToColumnHeaders(first_row_contents)
-    
+
   def SetFields(self, fields):
     """Changes the contents of the cells in the first row of this worksheet.
 
@@ -325,15 +325,15 @@ class Table(object):
     for column_name in fields:
       i = i + 1
       # TODO: speed this up by using a batch request to update cells.
-      self.client._GetSpreadsheetsClient().UpdateCell(1, i, column_name, 
+      self.client._GetSpreadsheetsClient().UpdateCell(1, i, column_name,
           self.spreadsheet_key, self.worksheet_id)
 
   def Delete(self):
     """Deletes this worksheet from the spreadsheet."""
     worksheet = self.client._GetSpreadsheetsClient().GetWorksheetsFeed(
-        self.spreadsheet_key, wksht_id=self.worksheet_id)
+        self.spreadsheet_key, wksht_id = self.worksheet_id)
     self.client._GetSpreadsheetsClient().DeleteWorksheet(
-        worksheet_entry=worksheet)
+        worksheet_entry = worksheet)
 
   def AddRecord(self, data):
     """Adds a new row to this worksheet.
@@ -344,13 +344,13 @@ class Table(object):
     Returns:
       Record which represents this row of the spreadsheet.
     """
-    new_row = self.client._GetSpreadsheetsClient().InsertRow(data, 
-        self.spreadsheet_key, wksht_id=self.worksheet_id)
-    return Record(content=data, row_entry=new_row, 
-        spreadsheet_key=self.spreadsheet_key, worksheet_id=self.worksheet_id,
-        database_client=self.client)
+    new_row = self.client._GetSpreadsheetsClient().InsertRow(data,
+        self.spreadsheet_key, wksht_id = self.worksheet_id)
+    return Record(content = data, row_entry = new_row,
+        spreadsheet_key = self.spreadsheet_key, worksheet_id = self.worksheet_id,
+        database_client = self.client)
 
-  def GetRecord(self, row_id=None, row_number=None):
+  def GetRecord(self, row_id = None, row_number = None):
     """Gets a single record from the worksheet based on row ID or number.
     
     Args:
@@ -364,20 +364,20 @@ class Table(object):
     """
     if row_id:
       row_entry = self.client._GetSpreadsheetsClient().GetListFeed(
-          self.spreadsheet_key, wksht_id=self.worksheet_id, row_id=row_id)
-      return Record(content=None, row_entry=row_entry, 
-           spreadsheet_key=self.spreadsheet_key, 
-           worksheet_id=self.worksheet_id, database_client=self.client)
+          self.spreadsheet_key, wksht_id = self.worksheet_id, row_id = row_id)
+      return Record(content = None, row_entry = row_entry,
+           spreadsheet_key = self.spreadsheet_key,
+           worksheet_id = self.worksheet_id, database_client = self.client)
     else:
       row_query = gdata.spreadsheet.service.ListQuery()
       row_query.start_index = str(row_number)
       row_query.max_results = '1'
       row_feed = self.client._GetSpreadsheetsClient().GetListFeed(
-          self.spreadsheet_key, wksht_id=self.worksheet_id, query=row_query)
+          self.spreadsheet_key, wksht_id = self.worksheet_id, query = row_query)
       if len(row_feed.entry) >= 1:
-        return Record(content=None, row_entry=row_feed.entry[0],
-            spreadsheet_key=self.spreadsheet_key,
-            worksheet_id=self.worksheet_id, database_client=self.client)
+        return Record(content = None, row_entry = row_feed.entry[0],
+            spreadsheet_key = self.spreadsheet_key,
+            worksheet_id = self.worksheet_id, database_client = self.client)
       else:
         return None
 
@@ -398,7 +398,7 @@ class Table(object):
     row_query.start_index = str(start_row)
     row_query.max_results = str(max_rows)
     rows_feed = self.client._GetSpreadsheetsClient().GetListFeed(
-        self.spreadsheet_key, wksht_id=self.worksheet_id, query=row_query)
+        self.spreadsheet_key, wksht_id = self.worksheet_id, query = row_query)
     return RecordResultSet(rows_feed, self.client, self.spreadsheet_key,
         self.worksheet_id)
 
@@ -418,8 +418,8 @@ class Table(object):
     row_query = gdata.spreadsheet.service.ListQuery()
     row_query.sq = query_string
     matching_feed = self.client._GetSpreadsheetsClient().GetListFeed(
-        self.spreadsheet_key, wksht_id=self.worksheet_id, query=row_query)
-    return RecordResultSet(matching_feed, self.client, 
+        self.spreadsheet_key, wksht_id = self.worksheet_id, query = row_query)
+    return RecordResultSet(matching_feed, self.client,
         self.spreadsheet_key, self.worksheet_id)
 
 
@@ -439,9 +439,9 @@ class RecordResultSet(list):
     self.feed = feed
     list(self)
     for entry in self.feed.entry:
-      self.append(Record(content=None, row_entry=entry, 
-          spreadsheet_key=spreadsheet_key, worksheet_id=worksheet_id,
-          database_client=client))
+      self.append(Record(content = None, row_entry = entry,
+          spreadsheet_key = spreadsheet_key, worksheet_id = worksheet_id,
+          database_client = client))
 
   def GetNext(self):
     """Fetches the next batch of rows in the result set.
@@ -451,8 +451,8 @@ class RecordResultSet(list):
     """
     next_link = self.feed.GetNextLink()
     if next_link and next_link.href:
-      new_feed = self.client._GetSpreadsheetsClient().Get(next_link.href, 
-          converter=gdata.spreadsheet.SpreadsheetsListFeedFromString)
+      new_feed = self.client._GetSpreadsheetsClient().Get(next_link.href,
+          converter = gdata.spreadsheet.SpreadsheetsListFeedFromString)
       return RecordResultSet(new_feed, self.client, self.spreadsheet_key,
           self.worksheet_id)
 
@@ -465,8 +465,8 @@ class Record(object):
         to column headers.
   """
 
-  def __init__(self, content=None, row_entry=None, spreadsheet_key=None, 
-       worksheet_id=None, database_client=None):
+  def __init__(self, content = None, row_entry = None, spreadsheet_key = None,
+       worksheet_id = None, database_client = None):
     """Constructor for a record.
     
     Args:
@@ -524,7 +524,7 @@ class Record(object):
     """
     if self.row_id:
       self.entry = self.client._GetSpreadsheetsClient().GetListFeed(
-          self.spreadsheet_key, wksht_id=self.worksheet_id, row_id=self.row_id)
+          self.spreadsheet_key, wksht_id = self.worksheet_id, row_id = self.row_id)
     self.ExtractContentFromEntry(self.entry)
 
   def Delete(self):
@@ -553,7 +553,7 @@ def ConvertStringsToColumnHeaders(proposed_headers):
     # of a spreadsheet, _n is appended to the name to make it unique.
     header_count = headers.count(sanitized)
     if header_count > 0:
-      headers.append('%s_%i' % (sanitized, header_count+1))
+      headers.append('%s_%i' % (sanitized, header_count + 1))
     else:
       headers.append(sanitized)
   return headers

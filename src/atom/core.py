@@ -38,7 +38,7 @@ class XmlElement(object):
   _members = None
   text = None
 
-  def __init__(self, text=None, *args, **kwargs):
+  def __init__(self, text = None, *args, **kwargs):
     if ('_members' not in self.__class__.__dict__
         or self.__class__._members is None):
       self.__class__._members = tuple(self.__class__._list_xml_members())
@@ -134,7 +134,7 @@ class XmlElement(object):
       return cls._get_rules(2)
     # Check the dict proxy for the rule set to avoid finding any rule sets
     # which belong to the superclass. We only want rule sets for this class.
-    if cls._rule_set[version-1] is None:
+    if cls._rule_set[version - 1] is None:
       # The rule set for each version consists of the qname for this element
       # ('{namespace}tag'), a dictionary (elements) for looking up the
       # corresponding class member when given a child element's qname, and a
@@ -152,7 +152,7 @@ class XmlElement(object):
         elif isinstance(target, tuple):
           # This member points to a versioned XML attribute.
           if version <= len(target):
-            attributes[target[version-1]] = member_name
+            attributes[target[version - 1]] = member_name
           else:
             attributes[target[-1]] = member_name
         elif isinstance(target, str):
@@ -162,14 +162,14 @@ class XmlElement(object):
           # This member points to a single occurance element.
           elements[_get_qname(target, version)] = (member_name, target, False)
       version_rules = (_get_qname(cls, version), elements, attributes)
-      cls._rule_set[version-1] = version_rules
+      cls._rule_set[version - 1] = version_rules
       return version_rules
     else:
-      return cls._rule_set[version-1]
+      return cls._rule_set[version - 1]
 
   _get_rules = classmethod(_get_rules)
 
-  def get_elements(self, tag=None, namespace=None, version=1):
+  def get_elements(self, tag = None, namespace = None, version = 1):
     """Find all sub elements which match the tag and namespace.
 
     To find all elements in this object, call get_elements with the tag and
@@ -214,7 +214,7 @@ class XmlElement(object):
   FindExtensions = get_elements
   FindChildren = get_elements
 
-  def get_attributes(self, tag=None, namespace=None, version=1):
+  def get_attributes(self, tag = None, namespace = None, version = 1):
     """Find all attributes which match the tag and namespace.
 
     To find all attributes in this object, call get_attributes with the tag
@@ -251,7 +251,7 @@ class XmlElement(object):
 
   GetAttributes = get_attributes
 
-  def _harvest_tree(self, tree, version=1):
+  def _harvest_tree(self, tree, version = 1):
     """Populates object members from the data in the tree Element."""
     qname, elements, attributes = self.__class__._get_rules(version)
     for element in tree:
@@ -278,12 +278,12 @@ class XmlElement(object):
     if tree.text:
       self.text = tree.text
 
-  def _to_tree(self, version=1):
+  def _to_tree(self, version = 1):
     new_tree = ElementTree.Element(_get_qname(self, version))
     self._attach_members(new_tree, version)
     return new_tree
 
-  def _attach_members(self, tree, version=1):
+  def _attach_members(self, tree, version = 1):
     """Convert members to XML elements/attributes and add them to the tree.
 
     Args:
@@ -295,7 +295,7 @@ class XmlElement(object):
             of this tree.
       version: int Ingnored in this method but used by VersionedElement.      
     """
-    qname, elements, attributes = self.__class__._get_rules(version)    
+    qname, elements, attributes = self.__class__._get_rules(version)
     # Add the expected elements and attributes to the tree.
     if elements:
       for tag, element_def in elements.items():
@@ -314,28 +314,31 @@ class XmlElement(object):
     # Add the unexpected (other) elements and attributes to the tree.
     for element in self._other_elements:
       element._become_child(tree, version)
-    
+
     for key, value in self._other_attributes.items():
       # I'm not sure if unicode can be used in the attribute name, so for now
       # we assume the encoding is correct for the attribute name.      
       tree.attrib[key] = value
-    
+
     if self.text:
         tree.text = self.text
 
-  def to_string(self, version=1):
+  def to_string(self, version = 1):
     """Converts this object to XML."""
-    return ElementTree.tostring(self._to_tree(version), encoding=str)
+    return ElementTree.tostring(self._to_tree(version), encoding = str)
 
   ToString = to_string
+
+  def ToBytes(self, version = 1):
+      return ElementTree.tostring(self._to_tree(version), encoding = 'utf-8')
 
   def __str__(self):
     return self.to_string()
 
-  def _become_child(self, tree, version=1):
+  def _become_child(self, tree, version = 1):
     """Adds a child element to tree with the XML data in self."""
-    new_child = ElementTree.Element( _get_qname(self, version) )
-    tree.append(new_child) 
+    new_child = ElementTree.Element(_get_qname(self, version))
+    tree.append(new_child)
     self._attach_members(new_child, version)
 
   def __get_extension_elements(self):
@@ -358,11 +361,11 @@ class XmlElement(object):
       __set_extension_attributes,
       """Provides backwards compatibility for v1 atom.AtomBase classes.""")
 
-  def _get_tag(self, version=1):
+  def _get_tag(self, version = 1):
     qname = _get_qname(self, version)
-    return qname[qname.find('}')+1:]
+    return qname[qname.find('}') + 1:]
 
-  def _get_namespace(self, version=1):
+  def _get_namespace(self, version = 1):
     qname = _get_qname(self, version)
     if qname.startswith('{'):
       return qname[1:qname.find('}')]
@@ -409,7 +412,7 @@ class XmlElement(object):
 def _get_qname(element, version):
   if isinstance(element._qname, tuple):
     if version <= len(element._qname):
-      return element._qname[version-1]
+      return element._qname[version - 1]
     else:
       return element._qname[-1]
   else:
@@ -463,7 +466,7 @@ def _qname_matches(tag, namespace, qname):
           and member_namespace is None))
 
 
-def parse(xml_string, target_class=None, version=1):
+def parse(xml_string, target_class = None, version = 1):
   """Parses the XML string according to the rules for the target_class.
 
   Args:
@@ -475,10 +478,10 @@ def parse(xml_string, target_class=None, version=1):
   """
   if target_class is None:
     target_class = XmlElement
-    
+
   if not isinstance(xml_string, bytes):
     raise Exception("This function only accepts bytes")
-        
+
   tree = ElementTree.fromstring(xml_string)
   return _xml_element_from_tree(tree, target_class, version)
 
@@ -488,7 +491,7 @@ xml_element_from_string = parse
 XmlElementFromString = xml_element_from_string
 
 
-def _xml_element_from_tree(tree, target_class, version=1):
+def _xml_element_from_tree(tree, target_class, version = 1):
   if target_class._qname is None:
     instance = target_class()
     instance._qname = tree.tag

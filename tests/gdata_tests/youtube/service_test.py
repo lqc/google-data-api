@@ -18,7 +18,7 @@ __author__ = 'api.jhartmann@gmail.com (Jochen Hartmann)'
 
 import getpass
 import time
-import StringIO
+import io
 import random
 import unittest
 import atom
@@ -99,7 +99,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(entry.title.text != '')
 
   def testRetrieveVideoEntryByVideoId(self):
-    entry = self.client.GetYouTubeVideoEntry(video_id='Ncakifd_16k')
+    entry = self.client.GetYouTubeVideoEntry(video_id = 'Ncakifd_16k')
     self.assert_(isinstance(entry, gdata.youtube.YouTubeVideoEntry))
     self.assert_(entry.title.text != '')
 
@@ -110,7 +110,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(len(feed.entry) > 0)
 
   def testRetrieveUserVideosbyUsername(self):
-    feed = self.client.GetYouTubeUserFeed(username='gdpython')
+    feed = self.client.GetYouTubeUserFeed(username = 'gdpython')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeVideoFeed))
     self.assert_(len(feed.entry) > 0)
 
@@ -130,29 +130,29 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(self.client.additional_headers['X-Gdata-Client'],
         YOUTUBE_TEST_CLIENT_ID)
 
-    test_video_title = 'my cool video ' + str(random.randint(1000,5000))
-    test_video_description = 'description ' + str(random.randint(1000,5000))
+    test_video_title = 'my cool video ' + str(random.randint(1000, 5000))
+    test_video_description = 'description ' + str(random.randint(1000, 5000))
 
     my_media_group = gdata.media.Group(
-      title = gdata.media.Title(text=test_video_title),
-      description = gdata.media.Description(description_type='plain',
-                                            text=test_video_description),
-      keywords = gdata.media.Keywords(text='video, foo'),
+      title = gdata.media.Title(text = test_video_title),
+      description = gdata.media.Description(description_type = 'plain',
+                                            text = test_video_description),
+      keywords = gdata.media.Keywords(text = 'video, foo'),
       category = gdata.media.Category(
-          text='Autos',
-          scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
-          label='Autos'),
-      player=None
+          text = 'Autos',
+          scheme = 'http://gdata.youtube.com/schemas/2007/categories.cat',
+          label = 'Autos'),
+      player = None
     )
     self.assert_(isinstance(my_media_group, gdata.media.Group))
 
     # Set Geo location to 37,-122 lat, long
     where = gdata.geo.Where()
-    where.set_location((37.0,-122.0))
-    
-    video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group,
-                                                  geo=where)
-    
+    where.set_location((37.0, -122.0))
+
+    video_entry = gdata.youtube.YouTubeVideoEntry(media = my_media_group,
+                                                  geo = where)
+
     self.assert_(isinstance(video_entry, gdata.youtube.YouTubeVideoEntry))
 
     new_entry = self.client.InsertVideoEntry(video_entry, video_file_location)
@@ -166,7 +166,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(upload_status[0] != '')
 
     # test updating entry meta-data
-    new_video_description = 'description ' + str(random.randint(1000,5000))
+    new_video_description = 'description ' + str(random.randint(1000, 5000))
     new_entry.media.description.text = new_video_description
 
     updated_entry = self.client.UpdateVideoEntry(new_entry)
@@ -197,35 +197,35 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(self.client.additional_headers['X-Gdata-Client'],
         YOUTUBE_TEST_CLIENT_ID)
 
-    test_video_title = 'my cool video ' + str(random.randint(1000,5000))
-    test_video_description = 'description ' + str(random.randint(1000,5000))
+    test_video_title = 'my cool video ' + str(random.randint(1000, 5000))
+    test_video_description = 'description ' + str(random.randint(1000, 5000))
 
-    test_developer_tag_01 = 'tag' + str(random.randint(1000,5000))
-    test_developer_tag_02 = 'tag' + str(random.randint(1000,5000))
-    test_developer_tag_03 = 'tag' + str(random.randint(1000,5000)) 
+    test_developer_tag_01 = 'tag' + str(random.randint(1000, 5000))
+    test_developer_tag_02 = 'tag' + str(random.randint(1000, 5000))
+    test_developer_tag_03 = 'tag' + str(random.randint(1000, 5000))
 
     my_media_group = gdata.media.Group(
-      title = gdata.media.Title(text=test_video_title),
-      description = gdata.media.Description(description_type='plain',
-                                            text=test_video_description),
-      keywords = gdata.media.Keywords(text='video, foo'),
+      title = gdata.media.Title(text = test_video_title),
+      description = gdata.media.Description(description_type = 'plain',
+                                            text = test_video_description),
+      keywords = gdata.media.Keywords(text = 'video, foo'),
       category = [gdata.media.Category(
-          text='Autos',
-          scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
-          label='Autos')],
-      player=None
+          text = 'Autos',
+          scheme = 'http://gdata.youtube.com/schemas/2007/categories.cat',
+          label = 'Autos')],
+      player = None
     )
 
     self.assert_(isinstance(my_media_group, gdata.media.Group))
 
-    video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+    video_entry = gdata.youtube.YouTubeVideoEntry(media = my_media_group)
     original_developer_tags = [test_developer_tag_01, test_developer_tag_02,
                                test_developer_tag_03]
 
     dev_tags = video_entry.AddDeveloperTags(original_developer_tags)
 
     for dev_tag in dev_tags:
-      self.assert_(dev_tag.text in original_developer_tags) 
+      self.assert_(dev_tag.text in original_developer_tags)
 
     self.assert_(isinstance(video_entry, gdata.youtube.YouTubeVideoEntry))
 
@@ -238,7 +238,7 @@ class YouTubeServiceTest(unittest.TestCase):
 
     developer_tags_from_new_entry = new_entry.GetDeveloperTags()
     for dev_tag in developer_tags_from_new_entry:
-      self.assert_(dev_tag.text in original_developer_tags) 
+      self.assert_(dev_tag.text in original_developer_tags)
 
     self.assertEquals(len(developer_tags_from_new_entry),
         len(original_developer_tags))
@@ -264,23 +264,23 @@ class YouTubeServiceTest(unittest.TestCase):
         'key=' + developer_key)
     self.assertEquals(self.client.additional_headers['X-Gdata-Client'],
         YOUTUBE_TEST_CLIENT_ID)
-    test_video_title = 'my cool video ' + str(random.randint(1000,5000))
-    test_video_description = 'description ' + str(random.randint(1000,5000))
+    test_video_title = 'my cool video ' + str(random.randint(1000, 5000))
+    test_video_description = 'description ' + str(random.randint(1000, 5000))
 
     my_media_group = gdata.media.Group(
-      title = gdata.media.Title(text=test_video_title),
-      description = gdata.media.Description(description_type='plain',
-                                            text=test_video_description),
-      keywords = gdata.media.Keywords(text='video, foo'),
+      title = gdata.media.Title(text = test_video_title),
+      description = gdata.media.Description(description_type = 'plain',
+                                            text = test_video_description),
+      keywords = gdata.media.Keywords(text = 'video, foo'),
       category = gdata.media.Category(
-          text='Autos',
-          scheme='http://gdata.youtube.com/schemas/2007/categories.cat',
-          label='Autos'),
-      player=None
+          text = 'Autos',
+          scheme = 'http://gdata.youtube.com/schemas/2007/categories.cat',
+          label = 'Autos'),
+      player = None
     )
     self.assert_(isinstance(my_media_group, gdata.media.Group))
 
-    video_entry = gdata.youtube.YouTubeVideoEntry(media=my_media_group)
+    video_entry = gdata.youtube.YouTubeVideoEntry(media = my_media_group)
     self.assert_(isinstance(video_entry, gdata.youtube.YouTubeVideoEntry))
 
     response = self.client.GetFormUploadToken(video_entry)
@@ -307,7 +307,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(len(feed.entry) > 0)
 
   def testRetrieveResponseVideoFeedById(self):
-    feed = self.client.GetYouTubeVideoResponseFeed(video_id='Ncakifd_16k')
+    feed = self.client.GetYouTubeVideoResponseFeed(video_id = 'Ncakifd_16k')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeVideoResponseFeed))
     self.assert_(len(feed.entry) > 0)
 
@@ -318,17 +318,17 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(len(feed.entry) > 0)
 
   def testRetrieveVideoCommentFeedByVideoId(self):
-    feed = self.client.GetYouTubeVideoCommentFeed(video_id='Ncakifd_16k')
+    feed = self.client.GetYouTubeVideoCommentFeed(video_id = 'Ncakifd_16k')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeVideoCommentFeed))
     self.assert_(len(feed.entry) > 0)
 
   def testAddComment(self):
     video_id = '9g6buYJTt_g'
-    video_entry = self.client.GetYouTubeVideoEntry(video_id=video_id)
-    random_comment_text = 'test_comment_' + str(random.randint(1000,50000))
-    self.client.AddComment(comment_text=random_comment_text,
-                           video_entry=video_entry)
-    comment_feed = self.client.GetYouTubeVideoCommentFeed(video_id=video_id)
+    video_entry = self.client.GetYouTubeVideoEntry(video_id = video_id)
+    random_comment_text = 'test_comment_' + str(random.randint(1000, 50000))
+    self.client.AddComment(comment_text = random_comment_text,
+                           video_entry = video_entry)
+    comment_feed = self.client.GetYouTubeVideoCommentFeed(video_id = video_id)
     comment_found = False
     for item in comment_feed.entry:
       if (item.content.text == random_comment_text):
@@ -337,7 +337,7 @@ class YouTubeServiceTest(unittest.TestCase):
 
   def testAddRating(self):
     video_id_to_rate = 'Ncakifd_16k'
-    video_entry = self.client.GetYouTubeVideoEntry(video_id=video_id_to_rate)
+    video_entry = self.client.GetYouTubeVideoEntry(video_id = video_id_to_rate)
     response = self.client.AddRating(3, video_entry)
     self.assert_(isinstance(response, gdata.GDataEntry))
 
@@ -348,7 +348,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assert_(len(feed.entry) > 0)
 
   def testRetrievePlaylistListFeedByUsername(self):
-    feed = self.client.GetYouTubePlaylistFeed(username='gdpython')
+    feed = self.client.GetYouTubePlaylistFeed(username = 'gdpython')
     self.assert_(isinstance(feed, gdata.youtube.YouTubePlaylistFeed))
     self.assert_(len(feed.entry) > 0)
 
@@ -361,13 +361,13 @@ class YouTubeServiceTest(unittest.TestCase):
         gdata.youtube.YouTubePlaylistVideoEntry))
 
   def testAddUpdateAndDeletePlaylist(self):
-    test_playlist_title = 'my test playlist ' + str(random.randint(1000,3000))
+    test_playlist_title = 'my test playlist ' + str(random.randint(1000, 3000))
     test_playlist_description = 'test playlist '
     response = self.client.AddPlaylist(test_playlist_title,
                                        test_playlist_description)
     self.assert_(isinstance(response, gdata.youtube.YouTubePlaylistEntry))
 
-    new_playlist_title = 'my updated playlist ' + str(random.randint(1000,4000))
+    new_playlist_title = 'my updated playlist ' + str(random.randint(1000, 4000))
     new_playlist_description = 'my updated playlist '
     playlist_entry_id = response.id.text.split('/')[-1]
 
@@ -394,21 +394,21 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(response, True)
 
   def testAddUpdateAndDeletePrivatePlaylist(self):
-    test_playlist_title = 'my test playlist ' + str(random.randint(1000,3000))
+    test_playlist_title = 'my test playlist ' + str(random.randint(1000, 3000))
     test_playlist_description = 'test playlist '
     response = self.client.AddPlaylist(test_playlist_title,
                                        test_playlist_description,
-                                       playlist_private=True)
+                                       playlist_private = True)
     self.assert_(isinstance(response, gdata.youtube.YouTubePlaylistEntry))
 
-    new_playlist_title = 'my updated playlist ' + str(random.randint(1000,4000))
+    new_playlist_title = 'my updated playlist ' + str(random.randint(1000, 4000))
     new_playlist_description = 'my updated playlist '
     playlist_entry_id = response.id.text.split('/')[-1]
 
     updated_playlist = self.client.UpdatePlaylist(playlist_entry_id,
                                                   new_playlist_title,
                                                   new_playlist_description,
-                                                  playlist_private=True)
+                                                  playlist_private = True)
 
     playlist_feed = self.client.GetYouTubePlaylistFeed()
 
@@ -431,7 +431,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(response, True)
 
   def testAddEditAndDeleteVideoFromPlaylist(self):
-    test_playlist_title = 'my test playlist ' + str(random.randint(1000,3000))
+    test_playlist_title = 'my test playlist ' + str(random.randint(1000, 3000))
     test_playlist_description = 'test playlist '
     response = self.client.AddPlaylist(test_playlist_title,
                                        test_playlist_description)
@@ -449,7 +449,7 @@ class YouTubeServiceTest(unittest.TestCase):
 
     playlist_entry_id = response.id.text.split('/')[-1]
     playlist_uri = response.id.text.split(playlist_entry_id)[0][:-1]
-    new_video_title = 'video number ' + str(random.randint(1000,3000))
+    new_video_title = 'video number ' + str(random.randint(1000, 3000))
     new_video_description = 'test video'
     time.sleep(10)
     response = self.client.UpdatePlaylistVideoEntryMetaData(
@@ -500,7 +500,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(all_types_found, True)
 
   def testRetrieveSubscriptionFeedByUsername(self):
-    feed = self.client.GetYouTubeSubscriptionFeed(username='gdpython')
+    feed = self.client.GetYouTubeSubscriptionFeed(username = 'gdpython')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeSubscriptionFeed))
     self.assert_(len(feed.entry) == 3)
 
@@ -531,12 +531,12 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(user.location.text, 'US')
 
   def testRetrieveUserProfileByUsername(self):
-    user = self.client.GetYouTubeUserEntry(username='gdpython')
+    user = self.client.GetYouTubeUserEntry(username = 'gdpython')
     self.assert_(isinstance(user, gdata.youtube.YouTubeUserEntry))
     self.assertEquals(user.location.text, 'US')
 
   def testRetrieveUserFavoritesFeed(self):
-    feed = self.client.GetUserFavoritesFeed(username='gdpython')
+    feed = self.client.GetUserFavoritesFeed(username = 'gdpython')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeVideoFeed))
     self.assert_(len(feed.entry) > 0)
 
@@ -547,7 +547,7 @@ class YouTubeServiceTest(unittest.TestCase):
 
   def testAddAndDeleteVideoFromFavorites(self):
     video_id = 'Ncakifd_16k'
-    video_entry = self.client.GetYouTubeVideoEntry(video_id=video_id)
+    video_entry = self.client.GetYouTubeVideoEntry(video_id = video_id)
     response = self.client.AddVideoEntryToFavorites(video_entry)
     self.assert_(isinstance(response, gdata.GDataEntry))
     time.sleep(10)
@@ -561,7 +561,7 @@ class YouTubeServiceTest(unittest.TestCase):
     self.assertEquals(len(feed.entry), 1)
 
   def testRetrieveContactFeedByUsername(self):
-    feed = self.client.GetYouTubeContactFeed(username='gdpython')
+    feed = self.client.GetYouTubeContactFeed(username = 'gdpython')
     self.assert_(isinstance(feed, gdata.youtube.YouTubeContactFeed))
     self.assertEquals(len(feed.entry), 1)
 

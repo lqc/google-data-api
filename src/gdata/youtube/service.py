@@ -42,7 +42,7 @@ YOUTUBE_QUERY_VALID_ORDERBY_PARAMETERS = ('published', 'viewCount', 'rating',
 YOUTUBE_QUERY_VALID_RACY_PARAMETERS = ('include', 'exclude')
 YOUTUBE_QUERY_VALID_FORMAT_PARAMETERS = ('1', '5', '6')
 YOUTUBE_STANDARDFEEDS = ('most_recent', 'recently_featured',
-                         'top_rated', 'most_viewed','watch_on_mobile')
+                         'top_rated', 'most_viewed', 'watch_on_mobile')
 YOUTUBE_UPLOAD_URI = 'http://uploads.gdata.youtube.com/feeds/api/users'
 YOUTUBE_UPLOAD_TOKEN_URI = 'http://gdata.youtube.com/action/GetUploadToken'
 YOUTUBE_VIDEO_URI = 'http://gdata.youtube.com/feeds/api/videos'
@@ -127,9 +127,9 @@ class YouTubeService(gdata.service.GDataService):
         http://code.google.com/apis/youtube/dashboard to obtain a (free) key.
   """
 
-  def __init__(self, email=None, password=None, source=None,
-               server=YOUTUBE_SERVER, additional_headers=None, client_id=None,
-               developer_key=None, **kwargs):
+  def __init__(self, email = None, password = None, source = None,
+               server = YOUTUBE_SERVER, additional_headers = None, client_id = None,
+               developer_key = None, **kwargs):
     """Creates a client for the YouTube service.
 
     Args:
@@ -150,8 +150,8 @@ class YouTubeService(gdata.service.GDataService):
       raise YouTubeError('You must also specify the clientId')
 
     gdata.service.GDataService.__init__(
-        self, email=email, password=password, service=YOUTUBE_SERVICE,
-        source=source, server=server, additional_headers=additional_headers,
+        self, email = email, password = password, service = YOUTUBE_SERVICE,
+        source = source, server = server, additional_headers = additional_headers,
         **kwargs)
 
     if client_id is not None and developer_key is not None:
@@ -169,9 +169,9 @@ class YouTubeService(gdata.service.GDataService):
     Returns:
       A YouTubeVideoFeed if successfully retrieved.
     """
-    return self.Get(uri, converter=gdata.youtube.YouTubeVideoFeedFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeVideoFeedFromString)
 
-  def GetYouTubeVideoEntry(self, uri=None, video_id=None):
+  def GetYouTubeVideoEntry(self, uri = None, video_id = None):
     """Retrieve a YouTubeVideoEntry.
 
     Either a uri or a video_id must be provided.
@@ -193,9 +193,9 @@ class YouTubeService(gdata.service.GDataService):
                          'to the GetYouTubeVideoEntry() method')
     elif video_id and not uri:
       uri = '%s/%s' % (YOUTUBE_VIDEO_URI, video_id)
-    return self.Get(uri, converter=gdata.youtube.YouTubeVideoEntryFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeVideoEntryFromString)
 
-  def GetYouTubeContactFeed(self, uri=None, username='default'):
+  def GetYouTubeContactFeed(self, uri = None, username = 'default'):
     """Retrieve a YouTubeContactFeed.
 
     Either a uri or a username must be provided.
@@ -215,7 +215,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     if uri is None:
       uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, username, 'contacts')
-    return self.Get(uri, converter=gdata.youtube.YouTubeContactFeedFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeContactFeedFromString)
 
   def GetYouTubeContactEntry(self, uri):
     """Retrieve a YouTubeContactEntry.
@@ -227,9 +227,9 @@ class YouTubeService(gdata.service.GDataService):
     Returns:
       A YouTubeContactEntry if successfully retrieved.
     """
-    return self.Get(uri, converter=gdata.youtube.YouTubeContactEntryFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeContactEntryFromString)
 
-  def GetYouTubeVideoCommentFeed(self, uri=None, video_id=None):
+  def GetYouTubeVideoCommentFeed(self, uri = None, video_id = None):
     """Retrieve a YouTubeVideoCommentFeed.
 
     Either a uri or a video_id must be provided.
@@ -253,7 +253,7 @@ class YouTubeService(gdata.service.GDataService):
     elif video_id and not uri:
       uri = '%s/%s/%s' % (YOUTUBE_VIDEO_URI, video_id, 'comments')
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeVideoCommentFeedFromString)
+        uri, converter = gdata.youtube.YouTubeVideoCommentFeedFromString)
 
   def GetYouTubeVideoCommentEntry(self, uri):
     """Retrieve a YouTubeVideoCommentEntry.
@@ -266,9 +266,9 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubeCommentEntry if successfully retrieved.
     """
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeVideoCommentEntryFromString)
+        uri, converter = gdata.youtube.YouTubeVideoCommentEntryFromString)
 
-  def GetYouTubeUserFeed(self, uri=None, username=None):
+  def GetYouTubeUserFeed(self, uri = None, username = None):
     """Retrieve a YouTubeVideoFeed of user uploaded videos
 
     Either a uri or a username must be provided.  This will retrieve list
@@ -292,9 +292,9 @@ class YouTubeService(gdata.service.GDataService):
                          'to the GetYouTubeUserFeed() method')
     elif username and not uri:
       uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, username, 'uploads')
-    return self.Get(uri, converter=gdata.youtube.YouTubeUserFeedFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeUserFeedFromString)
 
-  def GetYouTubeUserEntry(self, uri=None, username=None):
+  def GetYouTubeUserEntry(self, uri = None, username = None):
     """Retrieve a YouTubeUserEntry.
 
     Either a uri or a username must be provided.
@@ -316,9 +316,9 @@ class YouTubeService(gdata.service.GDataService):
                          'to the GetYouTubeUserEntry() method')
     elif username and not uri:
       uri = '%s/%s' % (YOUTUBE_USER_FEED_URI, username)
-    return self.Get(uri, converter=gdata.youtube.YouTubeUserEntryFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubeUserEntryFromString)
 
-  def GetYouTubePlaylistFeed(self, uri=None, username='default'):
+  def GetYouTubePlaylistFeed(self, uri = None, username = 'default'):
     """Retrieve a YouTubePlaylistFeed (a feed of playlists for a user).
 
     Either a uri or a username must be provided.
@@ -338,7 +338,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     if uri is None:
       uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, username, 'playlists')
-    return self.Get(uri, converter=gdata.youtube.YouTubePlaylistFeedFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubePlaylistFeedFromString)
 
   def GetYouTubePlaylistEntry(self, uri):
     """Retrieve a YouTubePlaylistEntry.
@@ -350,9 +350,9 @@ class YouTubeService(gdata.service.GDataService):
     Returns:
       A YouTubePlaylistEntry if successfully retrieved.
     """
-    return self.Get(uri, converter=gdata.youtube.YouTubePlaylistEntryFromString)
+    return self.Get(uri, converter = gdata.youtube.YouTubePlaylistEntryFromString)
 
-  def GetYouTubePlaylistVideoFeed(self, uri=None, playlist_id=None):
+  def GetYouTubePlaylistVideoFeed(self, uri = None, playlist_id = None):
     """Retrieve a YouTubePlaylistVideoFeed (a feed of videos on a playlist).
 
     Either a uri or a playlist_id must be provided.
@@ -376,9 +376,9 @@ class YouTubeService(gdata.service.GDataService):
     elif playlist_id and not uri:
       uri = '%s/%s' % (YOUTUBE_PLAYLIST_FEED_URI, playlist_id)
     return self.Get(
-        uri, converter=gdata.youtube.YouTubePlaylistVideoFeedFromString)
+        uri, converter = gdata.youtube.YouTubePlaylistVideoFeedFromString)
 
-  def GetYouTubeVideoResponseFeed(self, uri=None, video_id=None):
+  def GetYouTubeVideoResponseFeed(self, uri = None, video_id = None):
     """Retrieve a YouTubeVideoResponseFeed.
 
     Either a uri or a playlist_id must be provided.
@@ -402,7 +402,7 @@ class YouTubeService(gdata.service.GDataService):
     elif video_id and not uri:
       uri = '%s/%s/%s' % (YOUTUBE_VIDEO_URI, video_id, 'responses')
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeVideoResponseFeedFromString)
+        uri, converter = gdata.youtube.YouTubeVideoResponseFeedFromString)
 
   def GetYouTubeVideoResponseEntry(self, uri):
     """Retrieve a YouTubeVideoResponseEntry.
@@ -415,9 +415,9 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubeVideoResponseEntry if successfully retrieved.
     """
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeVideoResponseEntryFromString)
+        uri, converter = gdata.youtube.YouTubeVideoResponseEntryFromString)
 
-  def GetYouTubeSubscriptionFeed(self, uri=None, username='default'):
+  def GetYouTubeSubscriptionFeed(self, uri = None, username = 'default'):
     """Retrieve a YouTubeSubscriptionFeed.
 
     Either the uri of the feed or a username must be provided.
@@ -434,7 +434,7 @@ class YouTubeService(gdata.service.GDataService):
     if uri is None:
       uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, username, 'subscriptions')
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeSubscriptionFeedFromString)
+        uri, converter = gdata.youtube.YouTubeSubscriptionFeedFromString)
 
   def GetYouTubeSubscriptionEntry(self, uri):
     """Retrieve a YouTubeSubscriptionEntry.
@@ -446,9 +446,9 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubeVideoSubscriptionEntry if successfully retrieved.
     """
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeSubscriptionEntryFromString)
+        uri, converter = gdata.youtube.YouTubeSubscriptionEntryFromString)
 
-  def GetYouTubeRelatedVideoFeed(self, uri=None, video_id=None):
+  def GetYouTubeRelatedVideoFeed(self, uri = None, video_id = None):
     """Retrieve a YouTubeRelatedVideoFeed.
 
     Either a uri for the feed or a video_id is required.
@@ -472,7 +472,7 @@ class YouTubeService(gdata.service.GDataService):
     elif video_id and not uri:
       uri = '%s/%s/%s' % (YOUTUBE_VIDEO_URI, video_id, 'related')
     return self.Get(
-        uri, converter=gdata.youtube.YouTubeVideoFeedFromString)
+        uri, converter = gdata.youtube.YouTubeVideoFeedFromString)
 
   def GetTopRatedVideoFeed(self):
     """Retrieve the 'top_rated' standard video feed.
@@ -546,7 +546,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     return self.GetYouTubeVideoFeed(YOUTUBE_STANDARD_MOST_RESPONDED_URI)
 
-  def GetUserFavoritesFeed(self, username='default'):
+  def GetUserFavoritesFeed(self, username = 'default'):
     """Retrieve the favorites feed for a given user.
 
     Args:
@@ -561,8 +561,8 @@ class YouTubeService(gdata.service.GDataService):
     return self.GetYouTubeVideoFeed(favorites_feed_uri)
 
   def InsertVideoEntry(self, video_entry, filename_or_handle,
-                       youtube_username='default',
-                       content_type='video/quicktime'):
+                       youtube_username = 'default',
+                       content_type = 'video/quicktime'):
     """Upload a new video to YouTube using the direct upload mechanism.
 
     Needs authentication.
@@ -615,20 +615,20 @@ class YouTubeService(gdata.service.GDataService):
           'reason':'Accepted content types: %s' %
               ['video/%s' % (t) for t in YOUTUBE_SUPPORTED_UPLOAD_TYPES]})
 
-    if (isinstance(filename_or_handle, (str, unicode)) 
+    if (isinstance(filename_or_handle, (str, unicode))
         and os.path.exists(filename_or_handle)):
       mediasource = gdata.MediaSource()
       mediasource.setFile(filename_or_handle, content_type)
     elif hasattr(filename_or_handle, 'read'):
-      import StringIO
+      import io
       if hasattr(filename_or_handle, 'seek'):
         filename_or_handle.seek(0)
-      file_handle = StringIO.StringIO(filename_or_handle.read())
+      file_handle = io.BytesIO(filename_or_handle.read())
       name = 'video'
       if hasattr(filename_or_handle, 'name'):
         name = filename_or_handle.name
       mediasource = gdata.MediaSource(file_handle, content_type,
-          content_length=file_handle.len, file_name=name)
+          content_length = file_handle.len, file_name = name)
     else:
       raise YouTubeError({'status':YOUTUBE_INVALID_ARGUMENT, 'body':
           '`filename_or_handle` must be a path name or a file-like object',
@@ -641,14 +641,14 @@ class YouTubeService(gdata.service.GDataService):
     # Using a nested try statement to retain Python 2.4 compatibility
     try:
       try:
-        return self.Post(video_entry, uri=upload_uri, media_source=mediasource,
-                         converter=gdata.youtube.YouTubeVideoEntryFromString)
+        return self.Post(video_entry, uri = upload_uri, media_source = mediasource,
+                         converter = gdata.youtube.YouTubeVideoEntryFromString)
       except gdata.service.RequestError as e:
         raise YouTubeError(e.args[0])
     finally:
       del(self.additional_headers['Slug'])
 
-  def CheckUploadStatus(self, video_entry=None, video_id=None):
+  def CheckUploadStatus(self, video_entry = None, video_id = None):
     """Check upload status on a recently uploaded video entry.
 
     Needs authentication. Either video_entry or video_id must be provided.
@@ -670,7 +670,7 @@ class YouTubeService(gdata.service.GDataService):
       raise YouTubeError('You must provide at least a uri or a video_id '
                          'to the CheckUploadStatus() method')
     elif video_id and not video_entry:
-       video_entry = self.GetYouTubeVideoEntry(video_id=video_id)
+       video_entry = self.GetYouTubeVideoEntry(video_id = video_id)
 
     control = video_entry.control
     if control is not None:
@@ -686,7 +686,7 @@ class YouTubeService(gdata.service.GDataService):
 
             return (state_value, message)
 
-  def GetFormUploadToken(self, video_entry, uri=YOUTUBE_UPLOAD_TOKEN_URI):
+  def GetFormUploadToken(self, video_entry, uri = YOUTUBE_UPLOAD_TOKEN_URI):
     """Receives a YouTube Token and a YouTube PostUrl from a YouTubeVideoEntry.
 
     Needs authentication.
@@ -730,8 +730,8 @@ class YouTubeService(gdata.service.GDataService):
     for link in video_entry.link:
       if link.rel == 'edit':
         edit_uri = link.href
-    return self.Put(video_entry, uri=edit_uri,
-                    converter=gdata.youtube.YouTubeVideoEntryFromString)
+    return self.Put(video_entry, uri = edit_uri,
+                    converter = gdata.youtube.YouTubeVideoEntryFromString)
 
   def DeleteVideoEntry(self, video_entry):
     """Deletes a video entry.
@@ -768,7 +768,7 @@ class YouTubeService(gdata.service.GDataService):
       raise YouTubeError('rating_value must be between 1 and 5 in AddRating()')
 
     entry = gdata.GDataEntry()
-    rating = gdata.youtube.Rating(min='1', max='5')
+    rating = gdata.youtube.Rating(min = '1', max = '5')
     rating.extension_attributes['name'] = 'value'
     rating.extension_attributes['value'] = str(rating_value)
     entry.extension_elements.append(rating)
@@ -777,7 +777,7 @@ class YouTubeService(gdata.service.GDataService):
       if link.rel == YOUTUBE_RATING_LINK_REL:
         rating_uri = link.href
 
-    return self.Post(entry, uri=rating_uri)
+    return self.Post(entry, uri = rating_uri)
 
   def AddComment(self, comment_text, video_entry):
     """Add a comment to a video entry.
@@ -792,11 +792,11 @@ class YouTubeService(gdata.service.GDataService):
     Returns:
       True if the comment was added successfully.
     """
-    content = atom.Content(text=comment_text)
-    comment_entry = gdata.youtube.YouTubeVideoCommentEntry(content=content)
+    content = atom.Content(text = comment_text)
+    comment_entry = gdata.youtube.YouTubeVideoCommentEntry(content = content)
     comment_post_uri = video_entry.comments.feed_link[0].href
 
-    return self.Post(comment_entry, uri=comment_post_uri)
+    return self.Post(comment_entry, uri = comment_post_uri)
 
   def AddVideoResponse(self, video_id_to_respond_to, video_response):
     """Add a video response.
@@ -813,7 +813,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     post_uri = '%s/%s/%s' % (YOUTUBE_VIDEO_URI, video_id_to_respond_to,
                              'responses')
-    return self.Post(video_response, uri=post_uri)
+    return self.Post(video_response, uri = post_uri)
 
   def DeleteVideoResponse(self, video_id, response_video_id):
     """Delete a video response.
@@ -853,16 +853,16 @@ class YouTubeService(gdata.service.GDataService):
     if complaint_term not in YOUTUBE_COMPLAINT_CATEGORY_TERMS:
       raise YouTubeError('Your complaint_term is not valid')
 
-    content = atom.Content(text=complaint_text)
-    category = atom.Category(term=complaint_term,
-                             scheme=YOUTUBE_COMPLAINT_CATEGORY_SCHEME)
+    content = atom.Content(text = complaint_text)
+    category = atom.Category(term = complaint_term,
+                             scheme = YOUTUBE_COMPLAINT_CATEGORY_SCHEME)
 
-    complaint_entry = gdata.GDataEntry(content=content, category=[category])
+    complaint_entry = gdata.GDataEntry(content = content, category = [category])
     post_uri = '%s/%s/%s' % (YOUTUBE_VIDEO_URI, video_id, 'complaints')
 
     return self.Post(complaint_entry, post_uri)
 
-  def AddVideoEntryToFavorites(self, video_entry, username='default'):
+  def AddVideoEntryToFavorites(self, video_entry, username = 'default'):
     """Add a video entry to a users favorite feed.
 
     Needs authentication.
@@ -878,9 +878,9 @@ class YouTubeService(gdata.service.GDataService):
     post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, username, 'favorites')
 
     return self.Post(video_entry, post_uri,
-                     converter=gdata.youtube.YouTubeVideoEntryFromString)
+                     converter = gdata.youtube.YouTubeVideoEntryFromString)
 
-  def DeleteVideoEntryFromFavorites(self, video_id, username='default'):
+  def DeleteVideoEntryFromFavorites(self, video_id, username = 'default'):
     """Delete a video entry from the users favorite feed.
 
     Needs authentication.
@@ -898,7 +898,7 @@ class YouTubeService(gdata.service.GDataService):
     return self.Delete(edit_link)
 
   def AddPlaylist(self, playlist_title, playlist_description,
-                  playlist_private=None):
+                  playlist_private = None):
     """Add a new playlist to the currently authenticated users account.
 
     Needs authentication.
@@ -914,19 +914,19 @@ class YouTubeService(gdata.service.GDataService):
       The YouTubePlaylistEntry if successfully posted.
     """
     playlist_entry = gdata.youtube.YouTubePlaylistEntry(
-        title=atom.Title(text=playlist_title),
-        description=gdata.youtube.Description(text=playlist_description))
+        title = atom.Title(text = playlist_title),
+        description = gdata.youtube.Description(text = playlist_description))
     if playlist_private:
       playlist_entry.private = gdata.youtube.Private()
 
-    playlist_post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, 'default', 
+    playlist_post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, 'default',
                                       'playlists')
     return self.Post(playlist_entry, playlist_post_uri,
-                     converter=gdata.youtube.YouTubePlaylistEntryFromString)
+                     converter = gdata.youtube.YouTubePlaylistEntryFromString)
 
   def UpdatePlaylist(self, playlist_id, new_playlist_title,
-                     new_playlist_description, playlist_private=None,
-                     username='default'):
+                     new_playlist_description, playlist_private = None,
+                     username = 'default'):
     """Update a playlist with new meta-data.
 
     Needs authentication.
@@ -945,8 +945,8 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubePlaylistEntry if the update was successful.
     """
     updated_playlist = gdata.youtube.YouTubePlaylistEntry(
-        title=atom.Title(text=new_playlist_title),
-        description=gdata.youtube.Description(text=new_playlist_description))
+        title = atom.Title(text = new_playlist_title),
+        description = gdata.youtube.Description(text = new_playlist_description))
     if playlist_private:
       updated_playlist.private = gdata.youtube.Private()
 
@@ -954,7 +954,7 @@ class YouTubeService(gdata.service.GDataService):
                                                playlist_id)
 
     return self.Put(updated_playlist, playlist_put_uri,
-                    converter=gdata.youtube.YouTubePlaylistEntryFromString)
+                    converter = gdata.youtube.YouTubePlaylistEntryFromString)
 
   def DeletePlaylist(self, playlist_uri):
     """Delete a playlist from the currently authenticated users playlists.
@@ -971,8 +971,8 @@ class YouTubeService(gdata.service.GDataService):
     return self.Delete(playlist_uri)
 
   def AddPlaylistVideoEntryToPlaylist(
-      self, playlist_uri, video_id, custom_video_title=None,
-      custom_video_description=None):
+      self, playlist_uri, video_id, custom_video_title = None,
+      custom_video_description = None):
     """Add a video entry to a playlist, optionally providing a custom title
     and description.
 
@@ -991,18 +991,18 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubePlaylistVideoEntry if successfully posted.
     """
     playlist_video_entry = gdata.youtube.YouTubePlaylistVideoEntry(
-        atom_id=atom.Id(text=video_id))
+        atom_id = atom.Id(text = video_id))
     if custom_video_title:
-      playlist_video_entry.title = atom.Title(text=custom_video_title)
+      playlist_video_entry.title = atom.Title(text = custom_video_title)
     if custom_video_description:
       playlist_video_entry.description = gdata.youtube.Description(
-          text=custom_video_description)
+          text = custom_video_description)
 
     return self.Post(playlist_video_entry, playlist_uri,
-                    converter=gdata.youtube.YouTubePlaylistVideoEntryFromString)
+                    converter = gdata.youtube.YouTubePlaylistVideoEntryFromString)
 
   def UpdatePlaylistVideoEntryMetaData(
-      self, playlist_uri, playlist_entry_id, new_video_title, 
+      self, playlist_uri, playlist_entry_id, new_video_title,
       new_video_description, new_video_position):
     """Update the meta data for a YouTubePlaylistVideoEntry.
 
@@ -1023,14 +1023,14 @@ class YouTubeService(gdata.service.GDataService):
       A YouTubePlaylistVideoEntry if the update was successful.
     """
     playlist_video_entry = gdata.youtube.YouTubePlaylistVideoEntry(
-        title=atom.Title(text=new_video_title),
-        description=gdata.youtube.Description(text=new_video_description),
-        position=gdata.youtube.Position(text=str(new_video_position)))
+        title = atom.Title(text = new_video_title),
+        description = gdata.youtube.Description(text = new_video_description),
+        position = gdata.youtube.Position(text = str(new_video_position)))
 
     playlist_put_uri = playlist_uri + '/' + playlist_entry_id
 
     return self.Put(playlist_video_entry, playlist_put_uri,
-                    converter=gdata.youtube.YouTubePlaylistVideoEntryFromString)
+                    converter = gdata.youtube.YouTubePlaylistVideoEntryFromString)
 
   def DeletePlaylistVideoEntry(self, playlist_uri, playlist_video_entry_id):
     """Delete a playlist video entry from a playlist.
@@ -1066,20 +1066,20 @@ class YouTubeService(gdata.service.GDataService):
       A new YouTubeSubscriptionEntry if successfully posted.
     """
     subscription_category = atom.Category(
-        scheme=YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
-        term='channel')
+        scheme = YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
+        term = 'channel')
     subscription_username = gdata.youtube.Username(
-        text=username_to_subscribe_to)
+        text = username_to_subscribe_to)
 
     subscription_entry = gdata.youtube.YouTubeSubscriptionEntry(
-        category=subscription_category,
-        username=subscription_username)
+        category = subscription_category,
+        username = subscription_username)
 
-    post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username, 
+    post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username,
                              'subscriptions')
 
     return self.Post(subscription_entry, post_uri,
-                     converter=gdata.youtube.YouTubeSubscriptionEntryFromString)
+                     converter = gdata.youtube.YouTubeSubscriptionEntryFromString)
 
   def AddSubscriptionToFavorites(self, username, my_username = 'default'):
     """Add a new subscription to a users favorites to the currently
@@ -1097,19 +1097,19 @@ class YouTubeService(gdata.service.GDataService):
         A new YouTubeSubscriptionEntry if successful.
     """
     subscription_category = atom.Category(
-        scheme=YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
-        term='favorites')
-    subscription_username = gdata.youtube.Username(text=username)
+        scheme = YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
+        term = 'favorites')
+    subscription_username = gdata.youtube.Username(text = username)
 
     subscription_entry = gdata.youtube.YouTubeSubscriptionEntry(
-        category=subscription_category,
-        username=subscription_username)
+        category = subscription_category,
+        username = subscription_username)
 
     post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username,
                              'subscriptions')
 
     return self.Post(subscription_entry, post_uri,
-                     converter=gdata.youtube.YouTubeSubscriptionEntryFromString)
+                     converter = gdata.youtube.YouTubeSubscriptionEntryFromString)
 
   def AddSubscriptionToQuery(self, query, my_username = 'default'):
     """Add a new subscription to a specific keyword query to the currently
@@ -1126,19 +1126,19 @@ class YouTubeService(gdata.service.GDataService):
         A new YouTubeSubscriptionEntry if successful.
     """
     subscription_category = atom.Category(
-        scheme=YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
-        term='query')
-    subscription_query_string = gdata.youtube.QueryString(text=query)
+        scheme = YOUTUBE_SUBSCRIPTION_CATEGORY_SCHEME,
+        term = 'query')
+    subscription_query_string = gdata.youtube.QueryString(text = query)
 
     subscription_entry = gdata.youtube.YouTubeSubscriptionEntry(
-        category=subscription_category,
-        query_string=subscription_query_string)
+        category = subscription_category,
+        query_string = subscription_query_string)
 
     post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username,
                              'subscriptions')
 
     return self.Post(subscription_entry, post_uri,
-                     converter=gdata.youtube.YouTubeSubscriptionEntryFromString)
+                     converter = gdata.youtube.YouTubeSubscriptionEntryFromString)
 
 
 
@@ -1156,7 +1156,7 @@ class YouTubeService(gdata.service.GDataService):
     """
     return self.Delete(subscription_uri)
 
-  def AddContact(self, contact_username, my_username='default'):
+  def AddContact(self, contact_username, my_username = 'default'):
     """Add a new contact to the currently authenticated user's contact feed.
 
     Needs authentication.
@@ -1173,19 +1173,19 @@ class YouTubeService(gdata.service.GDataService):
     contact_category = atom.Category(
         scheme = 'http://gdata.youtube.com/schemas/2007/contact.cat',
         term = 'Friends')
-    contact_username = gdata.youtube.Username(text=contact_username)
+    contact_username = gdata.youtube.Username(text = contact_username)
     contact_entry = gdata.youtube.YouTubeContactEntry(
-        category=contact_category,
-        username=contact_username)
+        category = contact_category,
+        username = contact_username)
 
     contact_post_uri = '%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username,
                                      'contacts')
 
     return self.Post(contact_entry, contact_post_uri,
-                     converter=gdata.youtube.YouTubeContactEntryFromString)
+                     converter = gdata.youtube.YouTubeContactEntryFromString)
 
-  def UpdateContact(self, contact_username, new_contact_status, 
-                    new_contact_category, my_username='default'):
+  def UpdateContact(self, contact_username, new_contact_status,
+                    new_contact_category, my_username = 'default'):
     """Update a contact, providing a new status and a new category.
 
     Needs authentication.
@@ -1216,21 +1216,21 @@ class YouTubeService(gdata.service.GDataService):
                          (' '.join(YOUTUBE_CONTACT_CATEGORY)))
 
     contact_category = atom.Category(
-        scheme='http://gdata.youtube.com/schemas/2007/contact.cat',
-        term=new_contact_category)
+        scheme = 'http://gdata.youtube.com/schemas/2007/contact.cat',
+        term = new_contact_category)
 
-    contact_status = gdata.youtube.Status(text=new_contact_status)
+    contact_status = gdata.youtube.Status(text = new_contact_status)
     contact_entry = gdata.youtube.YouTubeContactEntry(
-        category=contact_category,
-        status=contact_status)
+        category = contact_category,
+        status = contact_status)
 
     contact_put_uri = '%s/%s/%s/%s' % (YOUTUBE_USER_FEED_URI, my_username,
                                        'contacts', contact_username)
 
     return self.Put(contact_entry, contact_put_uri,
-                    converter=gdata.youtube.YouTubeContactEntryFromString)
+                    converter = gdata.youtube.YouTubeContactEntryFromString)
 
-  def DeleteContact(self, contact_username, my_username='default'):
+  def DeleteContact(self, contact_username, my_username = 'default'):
     """Delete a contact from a users contact feed.
 
     Needs authentication.
@@ -1270,7 +1270,7 @@ class YouTubeService(gdata.service.GDataService):
     self.additional_headers['X-GData-Key'] = 'key=' + developer_key
 
   developer_key = property(_GetDeveloperKey, _SetDeveloperKey,
-                           doc="""The Developer Key property""")
+                           doc = """The Developer Key property""")
 
   def _GetClientId(self):
     """Getter for Client Id property.
@@ -1292,7 +1292,7 @@ class YouTubeService(gdata.service.GDataService):
     self.additional_headers['X-Gdata-Client'] = client_id
 
   client_id = property(_GetClientId, _SetClientId,
-                         doc="""The ClientId property""")
+                         doc = """The ClientId property""")
 
   def Query(self, uri):
     """Performs a query and returns a resulting feed or entry.
@@ -1376,8 +1376,8 @@ class YouTubeVideoQuery(gdata.service.Query):
         that match to the location entered.
   """
 
-  def __init__(self, video_id=None, feed_type=None, text_query=None,
-               params=None, categories=None):
+  def __init__(self, video_id = None, feed_type = None, text_query = None,
+               params = None, categories = None):
 
     if feed_type in YOUTUBE_STANDARDFEEDS:
       feed = 'http://%s/feeds/standardfeeds/%s' % (YOUTUBE_SERVER, feed_type)
@@ -1387,9 +1387,9 @@ class YouTubeVideoQuery(gdata.service.Query):
     else:
       feed = 'http://%s/feeds/videos' % (YOUTUBE_SERVER)
 
-    gdata.service.Query.__init__(self, feed, text_query=text_query,
-                                 params=params, categories=categories)
- 
+    gdata.service.Query.__init__(self, feed, text_query = text_query,
+                                 params = params, categories = categories)
+
   def _GetVideoQuery(self):
     if 'vq' in self:
       return self['vq']
@@ -1400,7 +1400,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['vq'] = val
 
   vq = property(_GetVideoQuery, _SetVideoQuery,
-                doc="""The video query (vq) query parameter""")
+                doc = """The video query (vq) query parameter""")
 
   def _GetOrderBy(self):
     if 'orderby' in self:
@@ -1416,7 +1416,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['orderby'] = val
 
   orderby = property(_GetOrderBy, _SetOrderBy,
-                     doc="""The orderby query parameter""")
+                     doc = """The orderby query parameter""")
 
   def _GetTime(self):
     if 'time' in self:
@@ -1431,7 +1431,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['time'] = val
 
   time = property(_GetTime, _SetTime,
-                  doc="""The time query parameter""")
+                  doc = """The time query parameter""")
 
   def _GetFormat(self):
     if 'format' in self:
@@ -1446,7 +1446,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['format'] = val
 
   format = property(_GetFormat, _SetFormat,
-                    doc="""The format query parameter""")
+                    doc = """The format query parameter""")
 
   def _GetRacy(self):
     if 'racy' in self:
@@ -1460,8 +1460,8 @@ class YouTubeVideoQuery(gdata.service.Query):
                          ' '.join(YOUTUBE_QUERY_VALID_RACY_PARAMETERS))
     self['racy'] = val
 
-  racy = property(_GetRacy, _SetRacy, 
-                  doc="""The racy query parameter""")
+  racy = property(_GetRacy, _SetRacy,
+                  doc = """The racy query parameter""")
 
   def _GetLanguageRestriction(self):
     if 'lr' in self:
@@ -1473,7 +1473,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['lr'] = val
 
   lr = property(_GetLanguageRestriction, _SetLanguageRestriction,
-                doc="""The lr (language restriction) query parameter""")
+                doc = """The lr (language restriction) query parameter""")
 
   def _GetIPRestriction(self):
     if 'restriction' in self:
@@ -1485,7 +1485,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['restriction'] = val
 
   restriction = property(_GetIPRestriction, _SetIPRestriction,
-                         doc="""The restriction query parameter""")
+                         doc = """The restriction query parameter""")
 
   def _GetLocation(self):
     if 'location' in self:
@@ -1497,7 +1497,7 @@ class YouTubeVideoQuery(gdata.service.Query):
     self['location'] = val
 
   location = property(_GetLocation, _SetLocation,
-                      doc="""The location query parameter""")
+                      doc = """The location query parameter""")
 
 
 
@@ -1510,8 +1510,8 @@ class YouTubeUserQuery(YouTubeVideoQuery):
   extensions.
   """
 
-  def __init__(self, username=None, feed_type=None, subscription_id=None,
-               text_query=None, params=None, categories=None):
+  def __init__(self, username = None, feed_type = None, subscription_id = None,
+               text_query = None, params = None, categories = None):
 
     uploads_favorites_playlists = ('uploads', 'favorites', 'playlists')
 
@@ -1522,13 +1522,13 @@ class YouTubeUserQuery(YouTubeVideoQuery):
       feed = "http://%s/feeds/users/%s/%s" % (YOUTUBE_SERVER, username,
                                               feed_type)
     elif feed_type in uploads_favorites_playlists:
-      feed = "http://%s/feeds/users/%s/%s" % (YOUTUBE_SERVER, username, 
+      feed = "http://%s/feeds/users/%s/%s" % (YOUTUBE_SERVER, username,
                                               feed_type)
     else:
       feed = "http://%s/feeds/users" % (YOUTUBE_SERVER)
 
-    YouTubeVideoQuery.__init__(self, feed, text_query=text_query,
-                               params=params, categories=categories)
+    YouTubeVideoQuery.__init__(self, feed, text_query = text_query,
+                               params = params, categories = categories)
 
 
 class YouTubePlaylistQuery(YouTubeVideoQuery):
@@ -1540,12 +1540,12 @@ class YouTubePlaylistQuery(YouTubeVideoQuery):
   extensions.
   """
 
-  def __init__(self, playlist_id, text_query=None, params=None,
-               categories=None):
+  def __init__(self, playlist_id, text_query = None, params = None,
+               categories = None):
     if playlist_id:
       feed = "http://%s/feeds/playlists/%s" % (YOUTUBE_SERVER, playlist_id)
     else:
       feed = "http://%s/feeds/playlists" % (YOUTUBE_SERVER)
 
-    YouTubeVideoQuery.__init__(self, feed, text_query=text_query,
-                               params=params, categories=categories)
+    YouTubeVideoQuery.__init__(self, feed, text_query = text_query,
+                               params = params, categories = categories)

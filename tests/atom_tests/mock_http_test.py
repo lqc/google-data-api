@@ -24,26 +24,26 @@ import atom.http
 
 
 class MockHttpClientUnitTest(unittest.TestCase):
-  
+
   def setUp(self):
     self.client = atom.mock_http.MockHttpClient()
 
   def testRepondToGet(self):
-    mock_response = atom.http_interface.HttpResponse(body='Hooray!',
-         status=200, reason='OK')
-    self.client.add_response(mock_response, 'GET', 
+    mock_response = atom.http_interface.HttpResponse(body = b'Hooray!',
+         status = 200, reason = 'OK')
+    self.client.add_response(mock_response, 'GET',
          'http://example.com/hooray')
 
     response = self.client.request('GET', 'http://example.com/hooray')
 
     self.assertEquals(len(self.client.recordings), 1)
     self.assertEquals(response.status, 200)
-    self.assertEquals(response.read(), 'Hooray!')
+    self.assertEquals(response.read(), b'Hooray!')
 
   def testRecordResponse(self):
     # Turn on pass-through record mode.
     self.client.real_client = atom.http.ProxiedHttpClient()
-    live_response = self.client.request('GET', 
+    live_response = self.client.request('GET',
         'http://www.google.com/base/feeds/snippets?max-results=1')
     live_response_body = live_response.read()
     self.assertEquals(live_response.status, 200)
@@ -68,7 +68,7 @@ class MockHttpClientUnitTest(unittest.TestCase):
 
 def suite():
   return unittest.TestSuite(
-      (unittest.makeSuite(MockHttpClientUnitTest,'test'),))
+      (unittest.makeSuite(MockHttpClientUnitTest, 'test'),))
 
 if __name__ == '__main__':
   unittest.main()

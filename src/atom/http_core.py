@@ -23,7 +23,7 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
 import os
-import io as StringIO
+import io
 import urllib
 import urllib.parse
 import http.client as httplib
@@ -60,7 +60,7 @@ class HttpRequest(object):
   method = None
   uri = None
 
-  def __init__(self, uri=None, method=None, headers=None):
+  def __init__(self, uri = None, method = None, headers = None):
     """Construct an HTTP request.
 
     Args:
@@ -78,7 +78,7 @@ class HttpRequest(object):
     self.uri = uri or Uri()
 
 
-  def add_body_part(self, data, mime_type, size=None):
+  def add_body_part(self, data, mime_type, size = None):
     """Adds data to the HTTP request body.
 
     If more than one part is added, this is assumed to be a mime-multipart
@@ -91,7 +91,8 @@ class HttpRequest(object):
       size: int Required if the data is a file like object. If the data is a
             string, the size is calculated so this parameter is ignored.
     """
-    if isinstance(data, str):
+
+    if isinstance(data, bytes):
       size = len(data)
     if size is None:
       # TODO: support chunked transfer if some of the body is of unknown size.
@@ -151,7 +152,7 @@ class HttpRequest(object):
   AddBodyPart = add_body_part
 
   def add_form_inputs(self, form_data,
-                      mime_type='application/x-www-form-urlencoded'):
+                      mime_type = 'application/x-www-form-urlencoded'):
     """Form-encodes and adds data to the request body.
 
     Args:
@@ -169,8 +170,8 @@ class HttpRequest(object):
     """Creates a deep copy of this request."""
     copied_uri = Uri(self.uri.scheme, self.uri.host, self.uri.port,
                      self.uri.path, self.uri.query.copy())
-    new_request = HttpRequest(uri=copied_uri, method=self.method,
-                              headers=self.headers.copy())
+    new_request = HttpRequest(uri = copied_uri, method = self.method,
+                              headers = self.headers.copy())
     new_request._body_parts = self._body_parts[:]
     return new_request
 
@@ -190,7 +191,7 @@ class Uri(object):
   port = None
   path = None
 
-  def __init__(self, scheme=None, host=None, port=None, path=None, query=None):
+  def __init__(self, scheme = None, host = None, port = None, path = None, query = None):
     """Constructor for a URI.
 
     Args:
@@ -216,7 +217,7 @@ class Uri(object):
 
   def _get_query_string(self):
     param_pairs = []
-    for key, value in self.query.iteritems():
+    for key, value in self.query.items():
       param_pairs.append('='.join((urllib.parse.quote_plus(key),
           urllib.parse.quote_plus(str(value)))))
     return '&'.join(param_pairs)
@@ -253,7 +254,7 @@ class Uri(object):
   def __str__(self):
     return self._to_string()
 
-  def modify_request(self, http_request=None):
+  def modify_request(self, http_request = None):
     """Sets HTTP request components based on the URI."""
     if http_request is None:
       http_request = HttpRequest()
@@ -320,7 +321,7 @@ class HttpResponse(object):
   reason = None
   _body = None
 
-  def __init__(self, status=None, reason=None, headers=None, body=None):
+  def __init__(self, status = None, reason = None, headers = None, body = None):
     self._headers = headers or {}
     if status is not None:
       self.status = status
@@ -330,9 +331,9 @@ class HttpResponse(object):
       if hasattr(body, 'read'):
         self._body = body
       else:
-        self._body = StringIO.StringIO(body)
+        self._body = io.BytesIO(body)
 
-  def getheader(self, name, default=None):
+  def getheader(self, name, default = None):
     if name in self._headers:
       return self._headers[name]
     else:
@@ -341,7 +342,7 @@ class HttpResponse(object):
   def getheaders(self):
     return self._headers
 
-  def read(self, amt=None):
+  def read(self, amt = None):
     if self._body is None:
       return None
     if not amt:
@@ -360,7 +361,7 @@ class HttpClient(object):
 
   Request = request
 
-  def _get_connection(self, uri, headers=None):
+  def _get_connection(self, uri, headers = None):
     """Opens a socket connection to the server to set up an HTTP request.
 
     Args:
@@ -381,7 +382,7 @@ class HttpClient(object):
         connection = httplib.HTTPConnection(uri.host, int(uri.port))
     return connection
 
-  def _http_request(self, method, uri, headers=None, body_parts=None):
+  def _http_request(self, method, uri, headers = None, body_parts = None):
     """Makes an HTTP request using httplib.
 
     Args:
@@ -395,7 +396,7 @@ class HttpClient(object):
     """
     if isinstance(uri, str):
       uri = Uri.parse_uri(uri)
-    connection = self._get_connection(uri, headers=headers)
+    connection = self._get_connection(uri, headers = headers)
 
     if self.debug:
       connection.debuglevel = 1
@@ -457,7 +458,7 @@ def _send_data_part(data, connection):
 
 class ProxiedHttpClient(HttpClient):
 
-  def _get_connection(self, uri, headers=None):
+  def _get_connection(self, uri, headers = None):
     # Check to see if there are proxy settings required for this request.
     proxy = None
     if uri.scheme == 'https':
@@ -465,7 +466,7 @@ class ProxiedHttpClient(HttpClient):
     elif uri.scheme == 'http':
       proxy = os.environ.get('http_proxy')
     if not proxy:
-      return HttpClient._get_connection(self, uri, headers=headers)
+      return HttpClient._get_connection(self, uri, headers = headers)
     # Now we have the URL of the appropriate proxy server.
     # Get a username and password for the proxy if required.
     proxy_auth = _get_proxy_auth()
@@ -488,7 +489,7 @@ class ProxiedHttpClient(HttpClient):
       if not proxy_uri.port:
         proxy_uri.port = '80'
       # Connect to the proxy server, very simple recv and error checking
-      p_sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+      p_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
       p_sock.connect((proxy_uri.host, int(proxy_uri.port)))
       p_sock.sendall(proxy_pieces)
       response = ''

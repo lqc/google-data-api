@@ -19,7 +19,7 @@ __author__ = 'api.jscudder (Jeffrey Scudder)'
 import getpass
 import time
 import unittest
-import StringIO
+import io
 import gdata.photos.service
 import gdata.photos
 import atom
@@ -43,7 +43,7 @@ class PhotosServiceTest(unittest.TestCase):
 
     # Give the album a unique title by appending the current time.
     self.test_album = self.client.InsertAlbum(
-        'Python library test' + str(time.time()), 
+        'Python library test' + str(time.time()),
         'A temporary test album.')
 
   def testUploadGetAndDeletePhoto(self):
@@ -56,13 +56,13 @@ class PhotosServiceTest(unittest.TestCase):
 
   def testInsertPhotoUpdateBlobAndDelete(self):
     new_entry = gdata.photos.PhotoEntry()
-    new_entry.title = atom.Title(text='a_test_image')
-    new_entry.summary = atom.Summary(text='Just a test.')
+    new_entry.title = atom.Title(text = 'a_test_image')
+    new_entry.summary = atom.Summary(text = 'Just a test.')
     new_entry.category.append(atom.Category(
-        scheme='http://schemas.google.com/g/2005#kind', 
-        term='http://schemas.google.com/photos/2007#photo'))
-    entry = self.client.InsertPhoto(self.test_album, new_entry, 
-        test_image_location, content_type='image/jpeg')
+        scheme = 'http://schemas.google.com/g/2005#kind',
+        term = 'http://schemas.google.com/photos/2007#photo'))
+    entry = self.client.InsertPhoto(self.test_album, new_entry,
+        test_image_location, content_type = 'image/jpeg')
     self.assert_(entry.id.text)
     updated_entry = self.client.UpdatePhotoBlob(entry, test_image_location)
     self.assert_(entry.GetEditLink().href != updated_entry.GetEditLink().href)
@@ -72,7 +72,7 @@ class PhotosServiceTest(unittest.TestCase):
     # Delete the test album.
     test_album = self.client.GetEntry(self.test_album.GetSelfLink().href)
     self.client.Delete(test_album)
-  
+
 
 if __name__ == '__main__':
   print ('Google Photos test\nNOTE: Please run these tests only with a test '

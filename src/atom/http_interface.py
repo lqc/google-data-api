@@ -33,8 +33,7 @@
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-import io as StringIO
-
+import io
 
 USER_AGENT = '%s GData-Python/2.0.2'
 
@@ -49,10 +48,10 @@ class UnparsableUrlObject(Error):
 
 class ContentLengthRequired(Error):
   pass
-  
+
 
 class HttpResponse(object):
-  def __init__(self, body=None, status=None, reason=None, headers=None):
+  def __init__(self, body = None, status = None, reason = None, headers = None):
     """Constructor for an HttpResponse object. 
 
     HttpResponse represents the server's response to an HTTP request from
@@ -74,7 +73,7 @@ class HttpResponse(object):
       if hasattr(body, 'read'):
         self._body = body
       else:
-        self._body = StringIO.StringIO(body)
+        self._body = io.BytesIO(body)
     else:
       self._body = None
     if status is not None:
@@ -84,13 +83,13 @@ class HttpResponse(object):
     self.reason = reason
     self._headers = headers or {}
 
-  def getheader(self, name, default=None):
+  def getheader(self, name, default = None):
     if name in self._headers:
       return self._headers[name]
     else:
       return default
-    
-  def read(self, amt=None):
+
+  def read(self, amt = None):
     if not amt:
       return self._body.read()
     else:
@@ -100,7 +99,7 @@ class HttpResponse(object):
 class GenericHttpClient(object):
   debug = False
 
-  def __init__(self, http_client, headers=None):
+  def __init__(self, http_client, headers = None):
     """
     
     Args:
@@ -114,24 +113,24 @@ class GenericHttpClient(object):
     self.http_client = http_client
     self.headers = headers or {}
 
-  def request(self, operation, url, data=None, headers=None):
+  def request(self, operation, url, data = None, headers = None):
     all_headers = self.headers.copy()
     if headers:
       all_headers.update(headers)
-    return self.http_client.request(operation, url, data=data, 
-        headers=all_headers)
+    return self.http_client.request(operation, url, data = data,
+        headers = all_headers)
 
-  def get(self, url, headers=None):
-    return self.request('GET', url, headers=headers)
+  def get(self, url, headers = None):
+    return self.request('GET', url, headers = headers)
 
-  def post(self, url, data, headers=None):
-    return self.request('POST', url, data=data, headers=headers)
+  def post(self, url, data, headers = None):
+    return self.request('POST', url, data = data, headers = headers)
 
-  def put(self, url, data, headers=None):
-    return self.request('PUT', url, data=data, headers=headers)
+  def put(self, url, data, headers = None):
+    return self.request('PUT', url, data = data, headers = headers)
 
-  def delete(self, url, headers=None):
-    return self.request('DELETE', url, headers=headers)
+  def delete(self, url, headers = None):
+    return self.request('DELETE', url, headers = headers)
 
 
 class GenericToken(object):
@@ -142,10 +141,10 @@ class GenericToken(object):
   request. Therefore the token is responsible for signing the request
   and adding the Authorization header. 
   """
-  def perform_request(self, http_client, operation, url, data=None, 
-                      headers=None):
+  def perform_request(self, http_client, operation, url, data = None,
+                      headers = None):
     """For the GenericToken, no Authorization token is set."""
-    return http_client.request(operation, url, data=data, headers=headers)
+    return http_client.request(operation, url, data = data, headers = headers)
 
   def valid_for_scope(self, url):
     """Tells the caller if the token authorizes access to the desired URL.

@@ -20,7 +20,7 @@ __author__ = ('api.jfisher (Jeff Fisher), '
 import os
 import re
 import getpass
-import StringIO
+import io
 import unittest
 import gdata.docs.service
 import gdata.spreadsheet.service
@@ -89,13 +89,13 @@ class DocumentListAclTest(unittest.TestCase):
 
   def testCreateAndUpdateAndDeleteAcl(self):
     # Add new ACL
-    scope = gdata.docs.Scope(value=self.EMAIL, type=self.SCOPE_TYPE)
-    role = gdata.docs.Role(value=self.ROLE_VALUE)
+    scope = gdata.docs.Scope(value = self.EMAIL, type = self.SCOPE_TYPE)
+    role = gdata.docs.Role(value = self.ROLE_VALUE)
 
     acl_entry = self.doclist.Post(
-        gdata.docs.DocumentListAclEntry(scope=scope, role=role),
+        gdata.docs.DocumentListAclEntry(scope = scope, role = role),
         self.feed.entry[0].GetAclLink().href,
-        converter=gdata.docs.DocumentListAclEntryFromString)
+        converter = gdata.docs.DocumentListAclEntryFromString)
     self.assert_(isinstance(acl_entry, gdata.docs.DocumentListAclEntry))
     self.assertEqual(acl_entry.scope.value, self.EMAIL)
     self.assertEqual(acl_entry.scope.type, self.SCOPE_TYPE)
@@ -107,7 +107,7 @@ class DocumentListAclTest(unittest.TestCase):
 
     updated_acl_entry = self.doclist.Put(
         acl_entry, acl_entry.GetEditLink().href,
-        converter=gdata.docs.DocumentListAclEntryFromString)
+        converter = gdata.docs.DocumentListAclEntryFromString)
 
     self.assertEqual(updated_acl_entry.scope.value, self.EMAIL)
     self.assertEqual(updated_acl_entry.scope.type, self.SCOPE_TYPE)
@@ -128,21 +128,21 @@ class DocumentListCreateAndDeleteTest(unittest.TestCase):
     self.doclist = client
     self.TITLE = 'Test title'
     self.new_entry = gdata.docs.DocumentListEntry()
-    category = gdata.atom.Category(scheme=gdata.docs.service.DATA_KIND_SCHEME,
-                                   term=gdata.docs.service.DOCUMENT_KIND_TERM,
-                                   label='document')
+    category = gdata.atom.Category(scheme = gdata.docs.service.DATA_KIND_SCHEME,
+                                   term = gdata.docs.service.DOCUMENT_KIND_TERM,
+                                   label = 'document')
     self.new_entry.category.append(category)
 
   def testCreateAndDeleteEmptyDocumentSlugHeaderTitle(self):
     created_entry = self.doclist.Post(self.new_entry,
                                       '/feeds/documents/private/full',
-                                      extra_headers={'Slug': self.TITLE})
+                                      extra_headers = {'Slug': self.TITLE})
     self.doclist.Delete(created_entry.GetEditLink().href)
     self.assertEqual(created_entry.title.text, self.TITLE)
     self.assertEqual(created_entry.category[0].label, 'document')
 
   def testCreateAndDeleteEmptyDocumentAtomTitle(self):
-    self.new_entry.title = gdata.atom.Title(text=self.TITLE)
+    self.new_entry.title = gdata.atom.Title(text = self.TITLE)
     created_entry = self.doclist.Post(self.new_entry,
                                       '/feeds/documents/private/full')
     self.doclist.Delete(created_entry.GetEditLink().href)
@@ -150,7 +150,7 @@ class DocumentListCreateAndDeleteTest(unittest.TestCase):
     self.assertEqual(created_entry.category[0].label, 'document')
 
   def testCreateAndDeleteEmptySpreadsheet(self):
-    self.new_entry.title = gdata.atom.Title(text=self.TITLE)
+    self.new_entry.title = gdata.atom.Title(text = self.TITLE)
     self.new_entry.category[0].term = gdata.docs.service.SPREADSHEET_KIND_TERM
     self.new_entry.category[0].label = 'spreadsheet'
     created_entry = self.doclist.Post(self.new_entry,
@@ -160,7 +160,7 @@ class DocumentListCreateAndDeleteTest(unittest.TestCase):
     self.assertEqual(created_entry.category[0].label, 'spreadsheet')
 
   def testCreateAndDeleteEmptyPresentation(self):
-    self.new_entry.title = gdata.atom.Title(text=self.TITLE)
+    self.new_entry.title = gdata.atom.Title(text = self.TITLE)
     self.new_entry.category[0].term = gdata.docs.service.PRESENTATION_KIND_TERM
     self.new_entry.category[0].label = 'presentation'
     created_entry = self.doclist.Post(self.new_entry,
@@ -203,8 +203,8 @@ class DocumentListMoveInAndOutOfFolderTest(unittest.TestCase):
     self.folder = self.doclist.CreateFolder(self.folder_name)
 
     self.doc_title = 'TestDoc'
-    self.ms = gdata.MediaSource(file_path='test.doc',
-                                content_type='application/msword')
+    self.ms = gdata.MediaSource(file_path = 'test.doc',
+                                content_type = 'application/msword')
 
   def tearDown(self):
     folder = self.doclist.Get(self.folder.GetSelfLink().href)
@@ -269,8 +269,8 @@ class DocumentListUploadTest(unittest.TestCase):
     self.doclist = client
 
   def testUploadAndDeleteDocument(self):
-    ms = gdata.MediaSource(file_path='test.doc',
-                           content_type='application/msword')
+    ms = gdata.MediaSource(file_path = 'test.doc',
+                           content_type = 'application/msword')
     entry = self.doclist.UploadDocument(ms, 'test doc')
     self.assertEqual(entry.title.text, 'test doc')
     self.assertEqual(entry.category[0].label, 'document')
@@ -278,8 +278,8 @@ class DocumentListUploadTest(unittest.TestCase):
     self.doclist.Delete(entry.GetEditLink().href)
 
   def testUploadAndDeletePresentation(self):
-    ms = gdata.MediaSource(file_path='test.ppt',
-                           content_type='application/vnd.ms-powerpoint')
+    ms = gdata.MediaSource(file_path = 'test.ppt',
+                           content_type = 'application/vnd.ms-powerpoint')
     entry = self.doclist.UploadPresentation(ms, 'test preso')
     self.assertEqual(entry.title.text, 'test preso')
     self.assertEqual(entry.category[0].label, 'presentation')
@@ -287,8 +287,8 @@ class DocumentListUploadTest(unittest.TestCase):
     self.doclist.Delete(entry.GetEditLink().href)
 
   def testUploadAndDeleteSpreadsheet(self):
-    ms = gdata.MediaSource(file_path='test.csv',
-                           content_type='text/csv')
+    ms = gdata.MediaSource(file_path = 'test.csv',
+                           content_type = 'text/csv')
     entry = self.doclist.UploadSpreadsheet(ms, 'test spreadsheet')
     self.assert_(entry.title.text == 'test spreadsheet')
     self.assertEqual(entry.category[0].label, 'spreadsheet')
@@ -301,11 +301,11 @@ class DocumentListUpdateTest(unittest.TestCase):
     self.doclist = client
     self.TITLE = 'CreatedTestDoc'
     new_entry = gdata.docs.DocumentListEntry()
-    new_entry.title = gdata.atom.Title(text=self.TITLE)
+    new_entry.title = gdata.atom.Title(text = self.TITLE)
     new_entry.category.append(
-        gdata.atom.Category(scheme=gdata.docs.service.DATA_KIND_SCHEME,
-                            term=gdata.docs.service.DOCUMENT_KIND_TERM,
-                            label='document'))
+        gdata.atom.Category(scheme = gdata.docs.service.DATA_KIND_SCHEME,
+                            term = gdata.docs.service.DOCUMENT_KIND_TERM,
+                            label = 'document'))
     self.created_entry = self.doclist.Post(new_entry,
                                            '/feeds/documents/private/full')
 
@@ -324,17 +324,17 @@ class DocumentListUpdateTest(unittest.TestCase):
     self.assertEqual(updated_entry.title.text, title)
 
     # Update document's content
-    ms = gdata.MediaSource(file_path='test.doc',
-                           content_type='application/msword')
+    ms = gdata.MediaSource(file_path = 'test.doc',
+                           content_type = 'application/msword')
     uri = updated_entry.GetEditMediaLink().href
     updated_entry = self.doclist.Put(ms, uri)
     self.assertEqual(updated_entry.title.text, title)
 
     # Append content to document
     data = 'data to append'
-    ms = gdata.MediaSource(file_handle=StringIO.StringIO(data),
-                           content_type='text/plain',
-                           content_length=len(data))
+    ms = gdata.MediaSource(file_handle = io.BytesIO(data),
+                           content_type = 'text/plain',
+                           content_length = len(data))
     uri = updated_entry.GetEditMediaLink().href + '?append=true'
     updated_entry = self.doclist.Put(ms, uri)
 
@@ -405,7 +405,7 @@ if __name__ == '__main__':
   client = gdata.docs.service.DocsService()
   spreadsheets = gdata.spreadsheet.service.SpreadsheetsService()
   client.ClientLogin(username, password,
-                     source='Document List Client Unit Tests')
+                     source = 'Document List Client Unit Tests')
   spreadsheets.ClientLogin(username, password,
-                           source='Document List Client Unit Tests')
+                           source = 'Document List Client Unit Tests')
   unittest.main()

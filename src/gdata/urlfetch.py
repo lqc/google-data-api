@@ -38,7 +38,7 @@ HttpRequest: Function that wraps google.appengine.api.urlfetch.Fetch in a
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-import StringIO
+import io
 import atom.service
 import atom.http_interface
 from google.appengine.api import urlfetch
@@ -55,11 +55,11 @@ def run_on_appengine(gdata_service):
 
 
 class AppEngineHttpClient(atom.http_interface.GenericHttpClient):
-  def __init__(self, headers=None):
+  def __init__(self, headers = None):
     self.debug = False
     self.headers = headers or {}
 
-  def request(self, operation, url, data=None, headers=None):
+  def request(self, operation, url, data = None, headers = None):
     """Performs an HTTP call to the server, supports GET, POST, PUT, and
     DELETE.
 
@@ -118,12 +118,12 @@ class AppEngineHttpClient(atom.http_interface.GenericHttpClient):
       method = urlfetch.DELETE
     else:
       method = None
-    return HttpResponse(urlfetch.Fetch(url=str(url), payload=data_str,
-        method=method, headers=all_headers))
- 
+    return HttpResponse(urlfetch.Fetch(url = str(url), payload = data_str,
+        method = method, headers = all_headers))
 
-def HttpRequest(service, operation, data, uri, extra_headers=None,
-    url_params=None, escape_params=True, content_type='application/atom+xml'):
+
+def HttpRequest(service, operation, data, uri, extra_headers = None,
+    url_params = None, escape_params = True, content_type = 'application/atom+xml'):
   """Performs an HTTP call to the server, supports GET, POST, PUT, and DELETE.
 
   This function is deprecated, use AppEngineHttpClient.request instead.
@@ -206,8 +206,8 @@ def HttpRequest(service, operation, data, uri, extra_headers=None,
     method = urlfetch.DELETE
   else:
     method = None
-  return HttpResponse(urlfetch.Fetch(url=full_url, payload=data_str, 
-      method=method, headers=headers))
+  return HttpResponse(urlfetch.Fetch(url = full_url, payload = data_str,
+      method = method, headers = headers))
 
 
 def __ConvertDataPart(data):
@@ -229,12 +229,12 @@ class HttpResponse(object):
   """
 
   def __init__(self, urlfetch_response):
-    self.body = StringIO.StringIO(urlfetch_response.content)
+    self.body = io.BytesIO(urlfetch_response.content)
     self.headers = urlfetch_response.headers
     self.status = urlfetch_response.status_code
     self.reason = ''
 
-  def read(self, length=None):
+  def read(self, length = None):
     if not length:
       return self.body.read()
     else:
@@ -244,4 +244,4 @@ class HttpResponse(object):
     if not self.headers.has_key(name):
       return self.headers[name.lower()]
     return self.headers[name]
-    
+

@@ -23,11 +23,11 @@ __author__ = 'j.s@google.com (Jeff Scudder)'
 
 import unittest
 import atom.http_core
-import StringIO
+import io
 
 
 class UriTest(unittest.TestCase):
-  
+
   def test_parse_uri(self):
     uri = atom.http_core.parse_uri('http://www.google.com/test?q=foo&z=bar')
     self.assert_(uri.scheme == 'http')
@@ -35,7 +35,7 @@ class UriTest(unittest.TestCase):
     self.assert_(uri.port is None)
     self.assert_(uri.path == '/test')
     self.assert_(uri.query == {'z':'bar', 'q':'foo'})
-    
+
   def test_modify_request_no_request(self):
     uri = atom.http_core.parse_uri('http://www.google.com/test?q=foo&z=bar')
     request = uri.modify_request()
@@ -49,17 +49,17 @@ class UriTest(unittest.TestCase):
     self.assert_(request.method is None)
     self.assert_(request.headers == {})
     self.assert_(request._body_parts == [])
-    
+
   def test_modify_request_http_with_set_port(self):
-    request = atom.http_core.HttpRequest(uri=atom.http_core.Uri(port=8080),
-                                         method='POST')
-    request.add_body_part('hello', 'text/plain') 
+    request = atom.http_core.HttpRequest(uri = atom.http_core.Uri(port = 8080),
+                                         method = 'POST')
+    request.add_body_part('hello', 'text/plain')
     uri = atom.http_core.parse_uri('//example.com/greet')
     self.assert_(uri.query == {})
     self.assert_(uri._get_relative_path() == '/greet')
     self.assert_(uri.host == 'example.com')
     self.assert_(uri.port is None)
-    
+
     uri.ModifyRequest(request)
     self.assert_(request.uri.host == 'example.com')
     # If no scheme was provided, the URI will not add one, but the HttpClient
@@ -69,10 +69,10 @@ class UriTest(unittest.TestCase):
     self.assert_(request.uri.path == '/greet')
     self.assert_(request.method == 'POST')
     self.assert_(request.headers['Content-Type'] == 'text/plain')
-    
+
   def test_modify_request_use_default_ssl_port(self):
     request = atom.http_core.HttpRequest(
-        uri=atom.http_core.Uri(scheme='https'), method='PUT')
+        uri = atom.http_core.Uri(scheme = 'https'), method = 'PUT')
     request.add_body_part('hello', 'text/plain')
     uri = atom.http_core.parse_uri('/greet')
     uri.modify_request(request)
@@ -88,7 +88,7 @@ class UriTest(unittest.TestCase):
     self.assert_(request._body_parts[0] == 'hello')
 
   def test_to_string(self):
-    uri = atom.http_core.Uri(host='www.google.com', query={'q':'sippycode'})
+    uri = atom.http_core.Uri(host = 'www.google.com', query = {'q':'sippycode'})
     uri_string = uri._to_string()
     self.assert_(uri_string == 'http://www.google.com/?q=sippycode')
 
@@ -107,9 +107,9 @@ class HttpRequestTest(unittest.TestCase):
     self.assert_(request._body_parts[0] == 'this is a test')
     self.assert_(request.headers['Content-Length'] == str(len(
         'this is a test')))
-    
+
   def test_add_file_without_size(self):
-    virtual_file = StringIO.StringIO('this is a test')
+    virtual_file = io.BytesIO(b'this is a test')
     request = atom.http_core.HttpRequest()
     try:
       request.add_body_part(virtual_file, 'text/plain')
@@ -125,8 +125,8 @@ class HttpRequestTest(unittest.TestCase):
 
   def test_copy(self):
     request = atom.http_core.HttpRequest(
-        uri=atom.http_core.Uri(scheme='https', host='www.google.com'),
-        method='POST', headers={'test':'1', 'ok':'yes'})
+        uri = atom.http_core.Uri(scheme = 'https', host = 'www.google.com'),
+        method = 'POST', headers = {'test':'1', 'ok':'yes'})
     request.add_body_part('body1', 'text/plain')
     request.add_body_part('<html>body2</html>', 'text/html')
     copied = request._copy()
@@ -143,10 +143,10 @@ class HttpRequestTest(unittest.TestCase):
 
 
 def suite():
-  return unittest.TestSuite((unittest.makeSuite(UriTest,'test'),
-                             unittest.makeSuite(HttpRequestTest,'test')))
+  return unittest.TestSuite((unittest.makeSuite(UriTest, 'test'),
+                             unittest.makeSuite(HttpRequestTest, 'test')))
 
- 
+
 if __name__ == '__main__':
   unittest.main()
 

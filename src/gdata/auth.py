@@ -35,8 +35,8 @@ import gdata.gauth
 __author__ = 'api.jscudder (Jeff Scudder)'
 
 
-PROGRAMMATIC_AUTH_LABEL = 'GoogleLogin auth='
-AUTHSUB_AUTH_LABEL = 'AuthSub token='
+PROGRAMMATIC_AUTH_LABEL = b'GoogleLogin auth='
+AUTHSUB_AUTH_LABEL = b'AuthSub token='
 
 
 """This module provides functions and objects used with Google authentication.
@@ -71,9 +71,9 @@ Related to AuthSub:
                         request.
 """
 
-def generate_client_login_request_body(email, password, service, source, 
-    account_type='HOSTED_OR_GOOGLE', captcha_token=None, 
-    captcha_response=None):
+def generate_client_login_request_body(email, password, service, source,
+    account_type = 'HOSTED_OR_GOOGLE', captcha_token = None,
+    captcha_response = None):
   """Creates the body of the autentication request
 
   See http://code.google.com/apis/accounts/AuthForInstalledApps.html#Request
@@ -114,7 +114,7 @@ def GenerateClientLoginAuthToken(http_body):
   """
   token = get_client_login_token(http_body)
   if token:
-    return 'GoogleLogin auth=%s' % token
+    return 'GoogleLogin auth=%s' % str(token, 'ascii')
   return None
 
 
@@ -149,14 +149,15 @@ def extract_client_login_token(http_body, scopes):
   Returns:
     A ClientLoginToken which is valid for the specified scopes.
   """
+  assert isinstance(http_body, bytes)
   token_string = get_client_login_token(http_body)
-  token = ClientLoginToken(scopes=scopes)
+  token = ClientLoginToken(scopes = scopes)
   token.set_token_string(token_string)
   return token
 
 
-def get_captcha_challenge(http_body, 
-    captcha_base_url='http://www.google.com/accounts/'):
+def get_captcha_challenge(http_body,
+    captcha_base_url = 'http://www.google.com/accounts/'):
   """Returns the URL and token for a CAPTCHA challenge issued by the server.
 
   Args:
@@ -185,8 +186,8 @@ GetCaptchaChallenge = get_captcha_challenge
 
 def GenerateOAuthRequestTokenUrl(
     oauth_input_params, scopes,
-    request_token_url='https://www.google.com/accounts/OAuthGetRequestToken',
-    extra_parameters=None):
+    request_token_url = 'https://www.google.com/accounts/OAuthGetRequestToken',
+    extra_parameters = None):
   """Generate a URL at which a request for OAuth request token is to be sent.
   
   Args:
@@ -211,8 +212,8 @@ def GenerateOAuthRequestTokenUrl(
   if extra_parameters:
     parameters.update(extra_parameters)
   oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-      oauth_input_params.GetConsumer(), http_url=request_token_url,
-      parameters=parameters)
+      oauth_input_params.GetConsumer(), http_url = request_token_url,
+      parameters = parameters)
   oauth_request.sign_request(oauth_input_params.GetSignatureMethod(),
                              oauth_input_params.GetConsumer(), None)
   return atom.url.parse_url(oauth_request.to_url())
@@ -220,9 +221,9 @@ def GenerateOAuthRequestTokenUrl(
 
 def GenerateOAuthAuthorizationUrl(
     request_token,
-    authorization_url='https://www.google.com/accounts/OAuthAuthorizeToken',
-    callback_url=None, extra_params=None,
-    include_scopes_in_callback=False, scopes_param_prefix='oauth_token_scope'):
+    authorization_url = 'https://www.google.com/accounts/OAuthAuthorizeToken',
+    callback_url = None, extra_params = None,
+    include_scopes_in_callback = False, scopes_param_prefix = 'oauth_token_scope'):
   """Generates URL at which user will login to authorize the request token.
   
   Args:
@@ -251,26 +252,26 @@ def GenerateOAuthAuthorizationUrl(
   """
   scopes = request_token.scopes
   if isinstance(scopes, list):
-    scopes = ' '.join(scopes)  
+    scopes = ' '.join(scopes)
   if include_scopes_in_callback and callback_url:
     if callback_url.find('?') > -1:
       callback_url += '&'
     else:
       callback_url += '?'
-    callback_url += urllib.parse.urlencode({scopes_param_prefix:scopes})  
+    callback_url += urllib.parse.urlencode({scopes_param_prefix:scopes})
   oauth_token = oauth.OAuthToken(request_token.key, request_token.secret)
   oauth_request = oauth.OAuthRequest.from_token_and_callback(
-      token=oauth_token, callback=callback_url,
-      http_url=authorization_url, parameters=extra_params)
+      token = oauth_token, callback = callback_url,
+      http_url = authorization_url, parameters = extra_params)
   return atom.url.parse_url(oauth_request.to_url())
 
 
 def GenerateOAuthAccessTokenUrl(
     authorized_request_token,
     oauth_input_params,
-    access_token_url='https://www.google.com/accounts/OAuthGetAccessToken',
-    oauth_version='1.0',
-    oauth_verifier=None):
+    access_token_url = 'https://www.google.com/accounts/OAuthGetAccessToken',
+    oauth_version = '1.0',
+    oauth_verifier = None):
   """Generates URL at which user will login to authorize the request token.
   
   Args:
@@ -294,16 +295,16 @@ def GenerateOAuthAccessTokenUrl(
   if oauth_verifier is not None:
     parameters['oauth_verifier'] = oauth_verifier
   oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-      oauth_input_params.GetConsumer(), token=oauth_token,
-      http_url=access_token_url, parameters=parameters)
+      oauth_input_params.GetConsumer(), token = oauth_token,
+      http_url = access_token_url, parameters = parameters)
   oauth_request.sign_request(oauth_input_params.GetSignatureMethod(),
                              oauth_input_params.GetConsumer(), oauth_token)
   return atom.url.parse_url(oauth_request.to_url())
 
 
-def GenerateAuthSubUrl(next, scope, secure=False, session=True, 
-    request_url='https://www.google.com/accounts/AuthSubRequest',
-    domain='default'):
+def GenerateAuthSubUrl(next, scope, secure = False, session = True,
+    request_url = 'https://www.google.com/accounts/AuthSubRequest',
+    domain = 'default'):
   """Generate a URL at which the user will login and be redirected back.
 
   Users enter their credentials on a Google login page and a token is sent
@@ -337,7 +338,7 @@ def GenerateAuthSubUrl(next, scope, secure=False, session=True,
     session = 0
 
   request_params = urllib.parse.urlencode({'next': next, 'scope': scope,
-                                     'secure': secure, 'session': session, 
+                                     'secure': secure, 'session': session,
                                      'hd': domain})
   if request_url.find('?') == -1:
     return '%s?%s' % (request_url, request_params)
@@ -347,9 +348,9 @@ def GenerateAuthSubUrl(next, scope, secure=False, session=True,
     return '%s&%s' % (request_url, request_params)
 
 
-def generate_auth_sub_url(next, scopes, secure=False, session=True,
-    request_url='https://www.google.com/accounts/AuthSubRequest', 
-    domain='default', scopes_param_prefix='auth_sub_scopes'):
+def generate_auth_sub_url(next, scopes, secure = False, session = True,
+    request_url = 'https://www.google.com/accounts/AuthSubRequest',
+    domain = 'default', scopes_param_prefix = 'auth_sub_scopes'):
   """Constructs a URL string for requesting a multiscope AuthSub token.
 
   The generated token will contain a URL parameter to pass along the 
@@ -442,8 +443,8 @@ def TokenFromUrl(url):
   return None
 
 
-def extract_auth_sub_token_from_url(url, 
-    scopes_param_prefix='auth_sub_scopes', rsa_key=None):
+def extract_auth_sub_token_from_url(url,
+    scopes_param_prefix = 'auth_sub_scopes', rsa_key = None):
   """Creates an AuthSubToken and sets the token value and scopes from the URL.
   
   After the Google Accounts AuthSub pages redirect the user's broswer back to 
@@ -474,10 +475,10 @@ def extract_auth_sub_token_from_url(url,
     scopes = url.params[scopes_param_prefix].split(' ')
   token_value = url.params['token']
   if rsa_key:
-    token = SecureAuthSubToken(rsa_key, scopes=scopes)
+    token = SecureAuthSubToken(rsa_key, scopes = scopes)
   else:
-    token = AuthSubToken(scopes=scopes)
-  token.set_token_string(token_value)
+    token = AuthSubToken(scopes = scopes)
+  token.set_token_string(bytes(token_value, 'ascii'))
   return token
 
 
@@ -498,7 +499,7 @@ def AuthSubTokenFromHttpBody(http_body):
   """
   token_value = token_from_http_body(http_body)
   if token_value:
-    return '%s%s' % (AUTHSUB_AUTH_LABEL, token_value)
+    return AUTHSUB_AUTH_LABEL + token_value
   return None
 
 
@@ -517,7 +518,7 @@ def token_from_http_body(http_body):
     The raw token value to use in an AuthSubToken object.
   """
   for response_line in http_body.splitlines():
-    if response_line.startswith('Token='):
+    if response_line.startswith(b'Token='):
       # Strip off Token= and return the token value string.
       return response_line[6:]
   return None
@@ -526,7 +527,7 @@ def token_from_http_body(http_body):
 TokenFromHttpBody = token_from_http_body
 
 
-def OAuthTokenFromUrl(url, scopes_param_prefix='oauth_token_scope'):
+def OAuthTokenFromUrl(url, scopes_param_prefix = 'oauth_token_scope'):
   """Creates an OAuthToken and sets token key and scopes (if present) from URL.
   
   After the Google Accounts OAuth pages redirect the user's broswer back to 
@@ -559,7 +560,7 @@ def OAuthTokenFromUrl(url, scopes_param_prefix='oauth_token_scope'):
   if scopes_param_prefix in url.params:
     scopes = url.params[scopes_param_prefix].split(' ')
   token_key = url.params['oauth_token']
-  token = OAuthToken(key=token_key, scopes=scopes)
+  token = OAuthToken(key = token_key, scopes = scopes)
   return token
 
 
@@ -574,9 +575,9 @@ def OAuthTokenFromHttpBody(http_body):
     OAuthToken OAuth token.
   """
   token = oauth.OAuthToken.from_string(http_body)
-  oauth_token = OAuthToken(key=token.key, secret=token.secret)
+  oauth_token = OAuthToken(key = token.key, secret = token.secret)
   return oauth_token
-  
+
 
 class OAuthSignatureMethod(object):
   """Holds valid OAuth signature methods.
@@ -584,22 +585,22 @@ class OAuthSignatureMethod(object):
   RSA_SHA1: Class to build signature according to RSA-SHA1 algorithm.
   HMAC_SHA1: Class to build signature according to HMAC-SHA1 algorithm.
   """
-  
-  HMAC_SHA1 = oauth.OAuthSignatureMethod_HMAC_SHA1  
-  
+
+  HMAC_SHA1 = oauth.OAuthSignatureMethod_HMAC_SHA1
+
   class RSA_SHA1(oauth_rsa.OAuthSignatureMethod_RSA_SHA1):
     """Provides implementation for abstract methods to return RSA certs."""
 
     def __init__(self, private_key, public_cert):
       self.private_key = private_key
       self.public_cert = public_cert
-  
+
     def _fetch_public_cert(self, unused_oauth_request):
       return self.public_cert
-  
+
     def _fetch_private_cert(self, unused_oauth_request):
       return self.private_key
-  
+
 
 class OAuthInputParams(object):
   """Stores OAuth input parameters.
@@ -607,9 +608,9 @@ class OAuthInputParams(object):
   This class is a store for OAuth input parameters viz. consumer key and secret,
   signature method and RSA key.
   """
-  
-  def __init__(self, signature_method, consumer_key, consumer_secret=None,
-               rsa_key=None, requestor_id=None):
+
+  def __init__(self, signature_method, consumer_key, consumer_secret = None,
+               rsa_key = None, requestor_id = None):
     """Initializes object with parameters required for using OAuth mechanism.
     
     NOTE: Though consumer_secret and rsa_key are optional, either of the two
@@ -670,7 +671,7 @@ class OAuthInputParams(object):
       self.__signature_strategy = signature_method
 
   _signature_method = property(__get_signature_method, __set_signature_method,
-      doc="""Returns object capable of signing the request using RSA of HMAC.
+      doc = """Returns object capable of signing the request using RSA of HMAC.
       
       Replaces the _signature_method member to avoid pickle errors.""")
 
@@ -708,29 +709,30 @@ class ClientLoginToken(atom.http_interface.GenericToken):
         'http://example.com/foo/bar' but it cannot be used for a request to
         'http://example.com/baz'
   """
-  def __init__(self, auth_header=None, scopes=None):
+  def __init__(self, auth_header = None, scopes = None):
     self.auth_header = auth_header
     self.scopes = scopes or []
 
   def __str__(self):
     return self.auth_header
 
-  def perform_request(self, http_client, operation, url, data=None,
-                      headers=None):
+  def perform_request(self, http_client, operation, url, data = None,
+                      headers = None):
     """Sets the Authorization header and makes the HTTP request."""
     if headers is None:
       headers = {'Authorization':self.auth_header}
     else:
       headers['Authorization'] = self.auth_header
-    return http_client.request(operation, url, data=data, headers=headers)
+    return http_client.request(operation, url, data = data, headers = headers)
 
   def get_token_string(self):
     """Removes PROGRAMMATIC_AUTH_LABEL to give just the token value."""
     return self.auth_header[len(PROGRAMMATIC_AUTH_LABEL):]
 
   def set_token_string(self, token_string):
-    self.auth_header = '%s%s' % (PROGRAMMATIC_AUTH_LABEL, token_string)
-  
+    assert isinstance(token_string, bytes)
+    self.auth_header = PROGRAMMATIC_AUTH_LABEL + token_string
+
   def valid_for_scope(self, url):
     """Tells the caller if the token authorizes access to the desired URL.
     """
@@ -759,7 +761,7 @@ class AuthSubToken(ClientLoginToken):
     return self.auth_header[len(AUTHSUB_AUTH_LABEL):]
 
   def set_token_string(self, token_string):
-    self.auth_header = '%s%s' % (AUTHSUB_AUTH_LABEL, token_string)
+    self.auth_header = AUTHSUB_AUTH_LABEL + token_string
 
 
 class OAuthToken(atom.http_interface.GenericToken):
@@ -780,14 +782,14 @@ class OAuthToken(atom.http_interface.GenericToken):
         'http://example.com/baz'
     oauth_input_params: OAuthInputParams OAuth input parameters.      
   """
-  
-  def __init__(self, key=None, secret=None, scopes=None,
-               oauth_input_params=None):
+
+  def __init__(self, key = None, secret = None, scopes = None,
+               oauth_input_params = None):
     self.key = key
     self.secret = secret
     self.scopes = scopes or []
     self.oauth_input_params = oauth_input_params
-  
+
   def __str__(self):
     return self.get_token_string()
 
@@ -804,12 +806,12 @@ class OAuthToken(atom.http_interface.GenericToken):
       oauth_token_secret=[1]. If both are absent, it returns None.
     """
     if self.key and self.secret:
-      return urllib.urlencode({'oauth_token': self.key,
-                               'oauth_token_secret': self.secret})
+      return urllib.parse.urlencode({'oauth_token': self.key,
+                               'oauth_token_secret': self.secret })
     elif self.key:
-      return 'oauth_token=%s' % self.key
+      return 'oauth_token=' + self.key
     elif self.secret:
-      return 'oauth_token_secret=%s' % self.secret
+      return 'oauth_token_secret=' + self.secret
     else:
       return None
 
@@ -822,13 +824,13 @@ class OAuthToken(atom.http_interface.GenericToken):
           self.key will be None. If oauth_token_secret is not present,
           self.secret will be None.
     """
-    token_params = urllib.parse.parse_qs(token_string, keep_blank_values=False)
+    token_params = urllib.parse.parse_qs(token_string, keep_blank_values = False)
     if 'oauth_token' in token_params:
       self.key = token_params['oauth_token'][0]
     if 'oauth_token_secret' in token_params:
       self.secret = token_params['oauth_token_secret'][0]
-    
-  def GetAuthHeader(self, http_method, http_url, realm=''):
+
+  def GetAuthHeader(self, http_method, http_url, realm = ''):
     """Get the authentication header.
 
     Args:
@@ -848,25 +850,25 @@ class OAuthToken(atom.http_interface.GenericToken):
     if self.key or self.secret:
       token = oauth.OAuthToken(self.key, self.secret)
     oauth_request = oauth.OAuthRequest.from_consumer_and_token(
-        self.oauth_input_params.GetConsumer(), token=token,
-        http_url=str(http_url), http_method=http_method,
-        parameters=http_url.params)
+        self.oauth_input_params.GetConsumer(), token = token,
+        http_url = str(http_url), http_method = http_method,
+        parameters = http_url.params)
     oauth_request.sign_request(self.oauth_input_params.GetSignatureMethod(),
                                self.oauth_input_params.GetConsumer(), token)
-    header = oauth_request.to_header(realm=realm)
+    header = oauth_request.to_header(realm = realm)
     header['Authorization'] = header['Authorization'].replace('+', '%2B')
     return header
-  
-  def perform_request(self, http_client, operation, url, data=None,
-                      headers=None):
+
+  def perform_request(self, http_client, operation, url, data = None,
+                      headers = None):
     """Sets the Authorization header and makes the HTTP request."""
     if not headers:
       headers = {}
     if self.oauth_input_params.requestor_id:
       url.params['xoauth_requestor_id'] = self.oauth_input_params.requestor_id
     headers.update(self.GetAuthHeader(operation, url))
-    return http_client.request(operation, url, data=data, headers=headers)
-    
+    return http_client.request(operation, url, data = data, headers = headers)
+
   def valid_for_scope(self, url):
     if isinstance(url, (str, unicode)):
       url = atom.url.parse_url(url)
@@ -884,8 +886,8 @@ class OAuthToken(atom.http_interface.GenericToken):
         continue
       elif scope.host == url.host and url.path.startswith(scope.path):
         return True
-    return False    
-    
+    return False
+
 
 class SecureAuthSubToken(AuthSubToken):
   """Stores the rsa private key, token, and scopes for the secure AuthSub token.
@@ -905,12 +907,12 @@ class SecureAuthSubToken(AuthSubToken):
         'http://example.com/foo/bar' but it cannot be used for a request to
         'http://example.com/baz'     
   """
-  
-  def __init__(self, rsa_key, token_string=None, scopes=None):
+
+  def __init__(self, rsa_key, token_string = None, scopes = None):
     self.rsa_key = keyfactory.parsePEMKey(rsa_key)
     self.token_string = token_string or ''
-    self.scopes = scopes or [] 
-   
+    self.scopes = scopes or []
+
   def __str__(self):
     return self.get_token_string()
 
@@ -919,7 +921,7 @@ class SecureAuthSubToken(AuthSubToken):
 
   def set_token_string(self, token_string):
     self.token_string = token_string
-    
+
   def GetAuthHeader(self, http_method, http_url):
     """Generates the Authorization header.
 
@@ -936,17 +938,25 @@ class SecureAuthSubToken(AuthSubToken):
       dict Header to be sent with every subsequent request after authentication.
     """
     timestamp = int(math.floor(time.time()))
-    nonce = '%lu' % random.randrange(1, 2**64)
-    data = '%s %s %d %s' % (http_method, str(http_url), timestamp, nonce)
+    nonce = '%lu' % random.randrange(1, 2 ** 64)
+    data = bytes('%s %s %d %s' % (http_method, str(http_url), timestamp, nonce), 'ascii')
+    nonce = bytes(nonce, 'ascii')
     sig = cryptomath.bytesToBase64(self.rsa_key.hashAndSign(data))
-    header = {'Authorization': '%s"%s" data="%s" sig="%s" sigalg="rsa-sha1"' %
-              (AUTHSUB_AUTH_LABEL, self.token_string, data, sig)}
+    header = {
+        'Authorization':
+              '{label}"{token}" data="{data}" sig="{signature}" sigalg="rsa-sha1"'.format(
+                    label = str(AUTHSUB_AUTH_LABEL, 'ascii'),
+                    token = self.token_string,
+                    data = str(data, 'ascii'),
+                    signature = str(sig, 'ascii')
+               )
+    }
     return header
-  
-  def perform_request(self, http_client, operation, url, data=None, 
-                      headers=None):
+
+  def perform_request(self, http_client, operation, url, data = None,
+                      headers = None):
     """Sets the Authorization header and makes the HTTP request."""
     if not headers:
       headers = {}
     headers.update(self.GetAuthHeader(operation, url))
-    return http_client.request(operation, url, data=data, headers=headers)
+    return http_client.request(operation, url, data = data, headers = headers)

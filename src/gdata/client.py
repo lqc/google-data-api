@@ -92,7 +92,7 @@ class NotModified(RequestError):
 
 
 def error_from_response(message, http_response, error_class,
-                        response_body=None):
+                        response_body = None):
 
   """Creates a new exception and sets the HTTP information in the error.
 
@@ -179,9 +179,9 @@ class GDClient(atom.client.AtomPubClient):
   # URL prefixes which should be requested for AuthSub and OAuth.
   auth_scopes = None
 
-  def request(self, method=None, uri=None, auth_token=None,
-              http_request=None, converter=None, desired_class=None,
-              redirects_remaining=4, **kwargs):
+  def request(self, method = None, uri = None, auth_token = None,
+              http_request = None, converter = None, desired_class = None,
+              redirects_remaining = 4, **kwargs):
     """Make an HTTP request to the server.
 
     See also documentation for atom.client.AtomPubClient.request.
@@ -258,8 +258,8 @@ class GDClient(atom.client.AtomPubClient):
     # performing the HTTP request.
     #http_request = self.modify_request(http_request)
 
-    response = atom.client.AtomPubClient.request(self, method=method,
-        uri=uri, auth_token=auth_token, http_request=http_request, **kwargs)
+    response = atom.client.AtomPubClient.request(self, method = method,
+        uri = uri, auth_token = auth_token, http_request = http_request, **kwargs)
     # On success, convert the response body using the desired converter
     # function if present.
     if response is None:
@@ -270,7 +270,7 @@ class GDClient(atom.client.AtomPubClient):
       elif desired_class is not None:
         if self.api_version is not None:
           return atom.core.parse(response.read(), desired_class,
-                                 version=get_xml_version(self.api_version))
+                                 version = get_xml_version(self.api_version))
         else:
           # No API version was specified, so allow parse to
           # use the default version.
@@ -289,10 +289,10 @@ class GDClient(atom.client.AtomPubClient):
             self.__gsessionid = m.group(1)
           # Make a recursive call with the gsession ID in the URI to follow
           # the redirect.
-          return self.request(method=method, uri=uri, auth_token=auth_token,
-                              http_request=http_request, converter=converter,
-                              desired_class=desired_class,
-                              redirects_remaining=redirects_remaining-1,
+          return self.request(method = method, uri = uri, auth_token = auth_token,
+                              http_request = http_request, converter = converter,
+                              desired_class = desired_class,
+                              redirects_remaining = redirects_remaining - 1,
                               **kwargs)
         else:
           raise error_from_response('302 received without Location header',
@@ -314,19 +314,19 @@ class GDClient(atom.client.AtomPubClient):
 
   Request = request
 
-  def request_client_login_token(self, email, password, source, service=None,
-      account_type='HOSTED_OR_GOOGLE',
-      auth_url=atom.http_core.Uri.parse_uri(
+  def request_client_login_token(self, email, password, source, service = None,
+      account_type = 'HOSTED_OR_GOOGLE',
+      auth_url = atom.http_core.Uri.parse_uri(
           'https://www.google.com/accounts/ClientLogin'),
-      captcha_token=None, captcha_response=None):
+      captcha_token = None, captcha_response = None):
     service = service or self.auth_service
     # Set the target URL.
-    http_request = atom.http_core.HttpRequest(uri=auth_url, method='POST')
+    http_request = atom.http_core.HttpRequest(uri = auth_url, method = 'POST')
     http_request.add_body_part(
-        gdata.gauth.generate_client_login_request_body(email=email,
-            password=password, service=service, source=source,
-            account_type=account_type, captcha_token=captcha_token,
-            captcha_response=captcha_response),
+        gdata.gauth.generate_client_login_request_body(email = email,
+            password = password, service = service, source = source,
+            account_type = account_type, captcha_token = captcha_token,
+            captcha_response = captcha_response),
         'application/x-www-form-urlencoded')
 
     # Use the underlying http_client to make the request.
@@ -367,18 +367,18 @@ class GDClient(atom.client.AtomPubClient):
 
   RequestClientLoginToken = request_client_login_token
 
-  def client_login(self, email, password, source, service=None,
-                   account_type='HOSTED_OR_GOOGLE',
-                   auth_url='https://www.google.com/accounts/ClientLogin',
-                   captcha_token=None, captcha_response=None):
+  def client_login(self, email, password, source, service = None,
+                   account_type = 'HOSTED_OR_GOOGLE',
+                   auth_url = 'https://www.google.com/accounts/ClientLogin',
+                   captcha_token = None, captcha_response = None):
     service = service or self.auth_service
     self.auth_token = self.request_client_login_token(email, password,
-        source, service=service, account_type=account_type, auth_url=auth_url,
-        captcha_token=captcha_token, captcha_response=captcha_response)
+        source, service = service, account_type = account_type, auth_url = auth_url,
+        captcha_token = captcha_token, captcha_response = captcha_response)
 
   ClientLogin = client_login
 
-  def upgrade_token(self, token=None, url=atom.http_core.Uri.parse_uri(
+  def upgrade_token(self, token = None, url = atom.http_core.Uri.parse_uri(
       'https://www.google.com/accounts/AuthSubSessionToken')):
     """Asks the Google auth server for a multi-use AuthSub token.
 
@@ -406,7 +406,7 @@ class GDClient(atom.client.AtomPubClient):
     if not isinstance(token, gdata.gauth.AuthSubToken):
       raise UnableToUpgradeToken(
           'Cannot upgrade the token because it is not an AuthSubToken object.')
-    http_request = atom.http_core.HttpRequest(uri=url, method='GET')
+    http_request = atom.http_core.HttpRequest(uri = url, method = 'GET')
     token.modify_request(http_request)
     # Use the lower level HttpClient to make the request.
     response = self.http_client.request(http_request)
@@ -420,9 +420,9 @@ class GDClient(atom.client.AtomPubClient):
 
   UpgradeToken = upgrade_token
 
-  def get_oauth_token(self, scopes, next, consumer_key, consumer_secret=None,
-                      rsa_private_key=None,
-                      url=gdata.gauth.REQUEST_TOKEN_URL):
+  def get_oauth_token(self, scopes, next, consumer_key, consumer_secret = None,
+                      rsa_private_key = None,
+                      url = gdata.gauth.REQUEST_TOKEN_URL):
     """Obtains an OAuth request token to allow the user to authorize this app.
 
     Once this client has a request token, the user can authorize the request
@@ -463,11 +463,11 @@ class GDClient(atom.client.AtomPubClient):
     if rsa_private_key is not None:
       http_request = gdata.gauth.generate_request_for_request_token(
           consumer_key, gdata.gauth.RSA_SHA1, scopes,
-          rsa_key=rsa_private_key, auth_server_url=url, next=next)
+          rsa_key = rsa_private_key, auth_server_url = url, next = next)
     elif consumer_secret is not None:
       http_request = gdata.gauth.generate_request_for_request_token(
           consumer_key, gdata.gauth.HMAC_SHA1, scopes,
-          consumer_secret=consumer_secret, auth_server_url=url, next=next)
+          consumer_secret = consumer_secret, auth_server_url = url, next = next)
     else:
       raise MissingOAuthParameters(
           'To request an OAuth token, you must provide your consumer secret'
@@ -492,7 +492,7 @@ class GDClient(atom.client.AtomPubClient):
   GetOAuthToken = get_oauth_token
 
   def get_access_token(self, request_token,
-                       url=gdata.gauth.ACCESS_TOKEN_URL):
+                       url = gdata.gauth.ACCESS_TOKEN_URL):
     """Exchanges an authorized OAuth request token for an access token.
 
     Contacts the Google OAuth server to upgrade a previously authorized
@@ -508,7 +508,7 @@ class GDClient(atom.client.AtomPubClient):
           Defaults to: https://www.google.com/accounts/OAuthAuthorizeToken
     """
     http_request = gdata.gauth.generate_request_for_access_token(
-        request_token, auth_server_url=url)
+        request_token, auth_server_url = url)
     response = self.http_client.request(http_request)
     response_body = response.read()
     if response.status != 200:
@@ -535,28 +535,28 @@ class GDClient(atom.client.AtomPubClient):
 
   ModifyRequest = modify_request
 
-  def get_feed(self, uri, auth_token=None, converter=None,
-               desired_class=gdata.data.GDFeed, **kwargs):
-    return self.request(method='GET', uri=uri, auth_token=auth_token,
-                        converter=converter, desired_class=desired_class,
+  def get_feed(self, uri, auth_token = None, converter = None,
+               desired_class = gdata.data.GDFeed, **kwargs):
+    return self.request(method = 'GET', uri = uri, auth_token = auth_token,
+                        converter = converter, desired_class = desired_class,
                         **kwargs)
 
   GetFeed = get_feed
 
-  def get_entry(self, uri, auth_token=None, converter=None,
-                desired_class=gdata.data.GDEntry, etag=None, **kwargs):
+  def get_entry(self, uri, auth_token = None, converter = None,
+                desired_class = gdata.data.GDEntry, etag = None, **kwargs):
     http_request = atom.http_core.HttpRequest()
     # Conditional retrieval
     if etag is not None:
       http_request.headers['If-None-Match'] = etag
-    return self.request(method='GET', uri=uri, auth_token=auth_token,
-                        http_request=http_request, converter=converter,
-                        desired_class=desired_class, **kwargs)
+    return self.request(method = 'GET', uri = uri, auth_token = auth_token,
+                        http_request = http_request, converter = converter,
+                        desired_class = desired_class, **kwargs)
 
   GetEntry = get_entry
 
-  def get_next(self, feed, auth_token=None, converter=None,
-               desired_class=None, **kwargs):
+  def get_next(self, feed, auth_token = None, converter = None,
+               desired_class = None, **kwargs):
     """Fetches the next set of results from the feed.
 
     When requesting a feed, the number of entries returned is capped at a
@@ -570,8 +570,8 @@ class GDClient(atom.client.AtomPubClient):
     """
     if converter is None and desired_class is None:
       desired_class = feed.__class__
-    return self.get_feed(feed.find_next_link(), auth_token=auth_token,
-                         converter=converter, desired_class=desired_class,
+    return self.get_feed(feed.find_next_link(), auth_token = auth_token,
+                         converter = converter, desired_class = desired_class,
                          **kwargs)
 
   GetNext = get_next
@@ -579,21 +579,21 @@ class GDClient(atom.client.AtomPubClient):
   # TODO: add a refresh method to re-fetch the entry/feed from the server
   # if it has been updated.
 
-  def post(self, entry, uri, auth_token=None, converter=None,
-           desired_class=None, **kwargs):
+  def post(self, entry, uri, auth_token = None, converter = None,
+           desired_class = None, **kwargs):
     if converter is None and desired_class is None:
       desired_class = entry.__class__
     http_request = atom.http_core.HttpRequest()
     http_request.add_body_part(
-        entry.to_string(get_xml_version(self.api_version)),
+        entry.ToBytes(get_xml_version(self.api_version)),
         'application/atom+xml')
-    return self.request(method='POST', uri=uri, auth_token=auth_token,
-                        http_request=http_request, converter=converter,
-                        desired_class=desired_class, **kwargs)
+    return self.request(method = 'POST', uri = uri, auth_token = auth_token,
+                        http_request = http_request, converter = converter,
+                        desired_class = desired_class, **kwargs)
 
   Post = post
 
-  def update(self, entry, auth_token=None, force=False, **kwargs):
+  def update(self, entry, auth_token = None, force = False, **kwargs):
     """Edits the entry on the server by sending the XML for this entry.
 
     Performs a PUT and converts the response to a new entry object with a
@@ -622,15 +622,15 @@ class GDClient(atom.client.AtomPubClient):
     elif hasattr(entry, 'etag') and entry.etag:
       http_request.headers['If-Match'] = entry.etag
 
-    return self.request(method='PUT', uri=entry.find_edit_link(),
-                        auth_token=auth_token, http_request=http_request,
-                        desired_class=entry.__class__, **kwargs)
+    return self.request(method = 'PUT', uri = entry.find_edit_link(),
+                        auth_token = auth_token, http_request = http_request,
+                        desired_class = entry.__class__, **kwargs)
 
   Update = update
 
-  def delete(self, entry_or_uri, auth_token=None, force=False, **kwargs):
+  def delete(self, entry_or_uri, auth_token = None, force = False, **kwargs):
     http_request = atom.http_core.HttpRequest()
-      
+
     # Include the ETag in the request if present.
     if force:
       http_request.headers['If-Match'] = '*'
@@ -640,12 +640,12 @@ class GDClient(atom.client.AtomPubClient):
     # If the user passes in a URL, just delete directly, may not work as
     # the service might require an ETag.
     if isinstance(entry_or_uri, (str, atom.http_core.Uri)):
-      return self.request(method='DELETE', uri=entry_or_uri,
-                          http_request=http_request, auth_token=auth_token,
+      return self.request(method = 'DELETE', uri = entry_or_uri,
+                          http_request = http_request, auth_token = auth_token,
                           **kwargs)
 
-    return self.request(method='DELETE', uri=entry_or_uri.find_edit_link(),
-                        http_request=http_request, auth_token=auth_token,
+    return self.request(method = 'DELETE', uri = entry_or_uri.find_edit_link(),
+                        http_request = http_request, auth_token = auth_token,
                         **kwargs)
 
   Delete = delete
@@ -665,10 +665,10 @@ def _add_query_param(param_string, value, http_request):
 
 class Query(object):
 
-  def __init__(self, text_query=None, categories=None, author=None, alt=None,
-               updated_min=None, updated_max=None, pretty_print=False,
-               published_min=None, published_max=None, start_index=None,
-               max_results=None, strict=False):
+  def __init__(self, text_query = None, categories = None, author = None, alt = None,
+               updated_min = None, updated_max = None, pretty_print = False,
+               published_min = None, published_max = None, start_index = None,
+               max_results = None, strict = False):
     """Constructs a Google Data Query to filter feed contents serverside.
 
     Args:
@@ -760,4 +760,4 @@ class GDQuery(atom.http_core.Uri):
     self.query['q'] = value
 
   text_query = property(_get_text_query, _set_text_query,
-      doc='The q parameter for searching for an exact text match on content')
+      doc = 'The q parameter for searching for an exact text match on content')

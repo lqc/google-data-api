@@ -1,7 +1,7 @@
 """Abstract class for RSA."""
 
-from gdata.tlslite.utils.cryptomath import *
-
+import gdata.tlslite.utils.cryptomath as cmath
+import hashlib
 
 class RSAKey:
     """This is an abstract base class for RSA keys.
@@ -17,7 +17,7 @@ class RSAKey:
     L{tlslite.utils.keyfactory}.
     """
 
-    def __init__(self, n=0, e=0):
+    def __init__(self, n = 0, e = 0):
         """Create a new RSA key.
 
         If n and e are passed in, the new key will be initialized.
@@ -35,7 +35,7 @@ class RSAKey:
 
         @rtype: int
         """
-        return numBits(self.n)
+        return self.n.bit_length
 
     def hasPrivateKey(self):
         """Return whether or not this key has a private component.
@@ -59,26 +59,25 @@ class RSAKey:
         """
         return "pkcs1-sha1"
 
-    def hashAndSign(self, bytes):
+    def hashAndSign(self, ba):
         """Hash and sign the passed-in bytes.
 
         This requires the key to have a private component.  It performs
         a PKCS1-SHA1 signature on the passed-in data.
 
-        @type bytes: str or L{array.array} of unsigned bytes
+        @type bytes: bytes or bytearray
         @param bytes: The value which will be hashed and signed.
 
         @rtype: L{array.array} of unsigned bytes.
         @return: A PKCS1-SHA1 signature on the passed-in data.
         """
-        if not isinstance(bytes, type("")):
-            bytes = bytesToString(bytes)
-        hashBytes = stringToBytes(sha.sha(bytes).digest())
-        prefixedHashBytes = self._addPKCS1SHA1Prefix(hashBytes)
+        s = hashlib.new('sha')
+        s.update(ba)
+        prefixedHashBytes = self._addPKCS1SHA1Prefix(s.digest())
         sigBytes = self.sign(prefixedHashBytes)
         return sigBytes
 
-    def hashAndVerify(self, sigBytes, bytes):
+    def hashAndVerify(self, sigBytes, b):
         """Hash and verify the passed-in bytes with the signature.
 
         This verifies a PKCS1-SHA1 signature on the passed-in data.
@@ -86,19 +85,18 @@ class RSAKey:
         @type sigBytes: L{array.array} of unsigned bytes
         @param sigBytes: A PKCS1-SHA1 signature.
 
-        @type bytes: str or L{array.array} of unsigned bytes
+        @type bytes: bytes or bytearray
         @param bytes: The value which will be hashed and verified.
 
         @rtype: bool
         @return: Whether the signature matches the passed-in data.
         """
-        if not isinstance(bytes, type("")):
-            bytes = bytesToString(bytes)
-        hashBytes = stringToBytes(sha.sha(bytes).digest())
-        prefixedHashBytes = self._addPKCS1SHA1Prefix(hashBytes)
+        s = hashlib.new('sha')
+        s.update(b)
+        prefixedHashBytes = self._addPKCS1SHA1Prefix(s.digest)
         return self.verify(sigBytes, prefixedHashBytes)
 
-    def sign(self, bytes):
+    def sign(self, b):
         """Sign the passed-in bytes.
 
         This requires the key to have a private component.  It performs
@@ -112,34 +110,33 @@ class RSAKey:
         """
         if not self.hasPrivateKey():
             raise AssertionError()
-        paddedBytes = self._addPKCS1Padding(bytes, 1)
-        m = bytesToNumber(paddedBytes)
+        paddedBytes = self._addPKCS1Padding(b, 1)
+        m = cmath.numberFromBytes(paddedBytes)
         if m >= self.n:
             raise ValueError()
         c = self._rawPrivateKeyOp(m)
-        sigBytes = numberToBytes(c)
-        return sigBytes
+        return bytearray(cmath.bytesOfNumber(c))
 
-    def verify(self, sigBytes, bytes):
+    def verify(self, sigBytes, b):
         """Verify the passed-in bytes with the signature.
 
         This verifies a PKCS1 signature on the passed-in data.
 
-        @type sigBytes: L{array.array} of unsigned bytes
+        @type sigBytes: bytearray
         @param sigBytes: A PKCS1 signature.
 
-        @type bytes: L{array.array} of unsigned bytes
+        @type bytes: bytearray
         @param bytes: The value which will be verified.
 
         @rtype: bool
         @return: Whether the signature matches the passed-in data.
         """
-        paddedBytes = self._addPKCS1Padding(bytes, 1)
-        c = bytesToNumber(sigBytes)
+        paddedBytes = self._addPKCS1Padding(b, 1)
+        c = cmath.numberFromBytes(sigBytes)
         if c >= self.n:
             return False
         m = self._rawPublicKeyOp(c)
-        checkBytes = numberToBytes(m)
+        checkBytes = bytearray(cmath.bytesOfNumber(m))
         return checkBytes == paddedBytes
 
     def encrypt(self, bytes):
@@ -154,12 +151,11 @@ class RSAKey:
         @return: A PKCS1 encryption of the passed-in data.
         """
         paddedBytes = self._addPKCS1Padding(bytes, 2)
-        m = bytesToNumber(paddedBytes)
+        m = cmath.numberFromBytes(paddedBytes)
         if m >= self.n:
             raise ValueError()
         c = self._rawPublicKeyOp(m)
-        encBytes = numberToBytes(c)
-        return encBytes
+        return bytearray(cmath.bytesOfNumber(c))
 
     def decrypt(self, encBytes):
         """Decrypt the passed-in bytes.
@@ -176,21 +172,21 @@ class RSAKey:
         """
         if not self.hasPrivateKey():
             raise AssertionError()
-        c = bytesToNumber(encBytes)
+        c = cmath.numberFromBytes(encBytes)
         if c >= self.n:
             return None
         m = self._rawPrivateKeyOp(c)
-        decBytes = numberToBytes(m)
-        if (len(decBytes) != numBytes(self.n)-1): #Check first byte
+        decBytes = cmath.bytesOfNumber(m)
+        if (len(decBytes) != cmath.numBytes(self.n) - 1): #Check first byte
             return None
         if decBytes[0] != 2: #Check second byte
             return None
-        for x in range(len(decBytes)-1): #Scan through for zero separator
-            if decBytes[x]== 0:
+        for x in range(len(decBytes) - 1): #Scan through for zero separator
+            if decBytes[x] == 0:
                 break
         else:
             return None
-        return decBytes[x+1:] #Return everything after the separator
+        return decBytes[x + 1:] #Return everything after the separator
 
     def _rawPrivateKeyOp(self, m):
         raise NotImplementedError()
@@ -206,7 +202,7 @@ class RSAKey:
         """
         raise NotImplementedError()
 
-    def write(self, password=None):
+    def write(self, password = None):
         """Return a string containing the key.
 
         @rtype: str
@@ -215,7 +211,7 @@ class RSAKey:
         """
         raise NotImplementedError()
 
-    def writeXMLPublicKey(self, indent=''):
+    def writeXMLPublicKey(self, indent = ''):
         """Return a string containing the key.
 
         @rtype: str
@@ -237,19 +233,18 @@ class RSAKey:
     # **************************************************************************
 
     def _addPKCS1SHA1Prefix(self, bytes):
-        prefixBytes = createByteArraySequence(\
-            [48,33,48,9,6,5,43,14,3,2,26,5,0,4,20])
+        prefixBytes = bytearray([48, 33, 48, 9, 6, 5, 43, 14, 3, 2, 26, 5, 0, 4, 20])
         prefixedBytes = prefixBytes + bytes
         return prefixedBytes
 
     def _addPKCS1Padding(self, bytes, blockType):
-        padLength = (numBytes(self.n) - (len(bytes)+3))
+        padLength = (cmath.numBytes(self.n) - (len(bytes) + 3))
         if blockType == 1: #Signature padding
-            pad = [0xFF] * padLength
+            pad = bytearray([0xFF] * padLength)
         elif blockType == 2: #Encryption padding
-            pad = createByteArraySequence([])
+            pad = bytearray()
             while len(pad) < padLength:
-                padBytes = getRandomBytes(padLength * 2)
+                padBytes = cmath.getRandomBytes(padLength * 2)
                 pad = [b for b in padBytes if b != 0]
                 pad = pad[:padLength]
         else:
@@ -259,6 +254,6 @@ class RSAKey:
         #the zero is lost when the returned padding is converted
         #to a number, so we don't even bother with it.  Also,
         #adding it would cause a misalignment in verify()
-        padding = createByteArraySequence([blockType] + pad + [0])
+        padding = bytearray([blockType]) + pad + bytearray([0])
         paddedBytes = padding + bytes
         return paddedBytes

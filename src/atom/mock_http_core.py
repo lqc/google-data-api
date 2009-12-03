@@ -21,7 +21,7 @@
 __author__ = 'j.s@google.com (Jeff Scudder)'
 
 
-import io as StringIO
+import io
 import pickle
 import os.path
 import tempfile
@@ -40,13 +40,13 @@ class MockHttpClient(object):
   cache_case_name = ''
   cache_test_name = ''
 
-  def __init__(self, recordings=None, real_client=None):
+  def __init__(self, recordings = None, real_client = None):
     self._recordings = recordings or []
     if real_client is not None:
       self.real_client = real_client
 
-  def add_response(self, http_request, status, reason, headers=None,
-      body=None):
+  def add_response(self, http_request, status, reason, headers = None,
+      body = None):
     response = MockHttpResponse(status, reason, headers, body)
     # TODO Scrub the request and the response.
     self._recordings.append((http_request._copy(), response))
@@ -104,7 +104,7 @@ class MockHttpClient(object):
     else:
       self.real_client = http_client
 
-  def use_cached_session(self, name=None, real_http_client=None):
+  def use_cached_session(self, name = None, real_http_client = None):
     """Attempts to load recordings from a previous live request.
 
     If a temp file with the recordings exists, then it is used to fulfill
@@ -137,7 +137,7 @@ class MockHttpClient(object):
     if self.real_client is not None:
       self._save_recordings(self._recordings_cache_name)
 
-  def delete_session(self, name=None):
+  def delete_session(self, name = None):
     """Removes recordings from a previous live request."""
     if name is None:
       self._delete_recordings(self._recordings_cache_name)
@@ -223,16 +223,16 @@ class EchoHttpClient(object):
     return self._http_request(http_request.uri, http_request.method,
                               http_request.headers, http_request._body_parts)
 
-  def _http_request(self, uri, method, headers=None, body_parts=None):
-    body = StringIO.StringIO()
-    response = atom.http_core.HttpResponse(status=200, reason='OK', body=body)
+  def _http_request(self, uri, method, headers = None, body_parts = None):
+    body = io.BytesIO()
+    response = atom.http_core.HttpResponse(status = 200, reason = 'OK', body = body)
     if headers is None:
       response._headers = {}
     else:
       # Copy headers from the request to the response but convert values to
       # strings. Server response headers always come in as strings, so an int
       # should be converted to a corresponding string when echoing.
-      for header, value in headers.iteritems():
+      for header, value in headers.items():
         response._headers[header] = str(value)
     response._headers['Echo-Host'] = '%s:%s' % (uri.host, str(uri.port))
     response._headers['Echo-Uri'] = uri._get_relative_path()
@@ -255,6 +255,8 @@ class SettableHttpClient(object):
 
     See set_response for details on the arguments to the constructor.
     """
+    assert isinstance(body, bytes)
+
     self.set_response(status, reason, body, headers)
     self.last_request = None
 
@@ -268,8 +270,8 @@ class SettableHttpClient(object):
             object (something with a read method).
       headers: dict of strings containing the HTTP headers in the response.
     """
-    self.response = atom.http_core.HttpResponse(status=status, reason=reason,
-        body=body)
+    self.response = atom.http_core.HttpResponse(status = status, reason = reason,
+        body = body)
     self.response._headers = headers.copy()
 
   def request(self, http_request):
@@ -279,7 +281,7 @@ class SettableHttpClient(object):
 
 class MockHttpResponse(atom.http_core.HttpResponse):
 
-  def __init__(self, status=None, reason=None, headers=None, body=None):
+  def __init__(self, status = None, reason = None, headers = None, body = None):
     self._headers = headers or {}
     if status is not None:
       self.status = status

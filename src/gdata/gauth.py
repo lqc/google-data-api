@@ -69,8 +69,8 @@ class UnsupportedTokenType(Error):
 
 # ClientLogin functions and classes.
 def generate_client_login_request_body(email, password, service, source,
-    account_type='HOSTED_OR_GOOGLE', captcha_token=None,
-    captcha_response=None):
+    account_type = 'HOSTED_OR_GOOGLE', captcha_token = None,
+    captcha_response = None):
   """Creates the body of the autentication request
 
   See http://code.google.com/apis/accounts/AuthForInstalledApps.html#Request
@@ -100,7 +100,7 @@ def generate_client_login_request_body(email, password, service, source,
     # user is responding to a captch challenge.
     request_fields['logintoken'] = captcha_token
     request_fields['logincaptcha'] = captcha_response
-  return urllib.parse.urlencode(request_fields)
+  return bytes(urllib.parse.urlencode(request_fields), 'ascii')
 
 
 GenerateClientLoginRequestBody = generate_client_login_request_body
@@ -120,17 +120,18 @@ def get_client_login_token_string(http_body):
     The token value string for a ClientLoginToken.
   """
   for response_line in http_body.splitlines():
-    if response_line.startswith('Auth='):
+    if response_line.startswith(b'Auth='):
       # Strip off the leading Auth= and return the Authorization value.
       return response_line[5:]
   return None
+
 
 
 GetClientLoginTokenString = get_client_login_token_string
 
 
 def get_captcha_challenge(http_body,
-    captcha_base_url='http://www.google.com/accounts/'):
+    captcha_base_url = 'http://www.google.com/accounts/'):
   """Returns the URL and token for a CAPTCHA challenge issued by the server.
 
   Args:
@@ -154,14 +155,13 @@ def get_captcha_challenge(http_body,
   contains_captcha_challenge = False
   captcha_parameters = {}
   for response_line in http_body.splitlines():
-    if response_line.startswith('Error=CaptchaRequired'):
+    if response_line.startswith(b'Error=CaptchaRequired'):
       contains_captcha_challenge = True
-    elif response_line.startswith('CaptchaToken='):
+    elif response_line.startswith(b'CaptchaToken='):
       # Strip off the leading CaptchaToken=
       captcha_parameters['token'] = response_line[13:]
-    elif response_line.startswith('CaptchaUrl='):
-      captcha_parameters['url'] = '%s%s' % (captcha_base_url,
-          response_line[11:])
+    elif response_line.startswith(b'CaptchaUrl='):
+      captcha_parameters['url'] = captcha_base_url + str(response_line[11:], 'ascii')
   if contains_captcha_challenge:
     return captcha_parameters
   else:
@@ -190,10 +190,10 @@ def _to_uri(str_or_uri):
   return str_or_uri
 
 
-def generate_auth_sub_url(next, scopes, secure=False, session=True,
-    request_url=atom.http_core.parse_uri(
+def generate_auth_sub_url(next, scopes, secure = False, session = True,
+    request_url = atom.http_core.parse_uri(
         'https://www.google.com/accounts/AuthSubRequest'),
-    domain='default', scopes_param_prefix='auth_sub_scopes'):
+    domain = 'default', scopes_param_prefix = 'auth_sub_scopes'):
   """Constructs a URI for requesting a multiscope AuthSub token.
 
   The generated token will contain a URL parameter to pass along the
@@ -254,7 +254,7 @@ def generate_auth_sub_url(next, scopes, secure=False, session=True,
   return request_url
 
 
-def auth_sub_string_from_url(url, scopes_param_prefix='auth_sub_scopes'):
+def auth_sub_string_from_url(url, scopes_param_prefix = 'auth_sub_scopes'):
   """Finds the token string (and scopes) after the browser is redirected.
 
   After the Google Accounts AuthSub pages redirect the user's broswer back to
@@ -281,9 +281,10 @@ def auth_sub_string_from_url(url, scopes_param_prefix='auth_sub_scopes'):
   """
   if isinstance(url, str):
     url = atom.http_core.Uri.parse_uri(url)
+
   if 'token' not in url.query:
     return (None, None)
-  token = url.query['token']
+  token = bytes(url.query['token'], 'ascii')
   # TODO: decide whether no scopes should be None or ().
   scopes = None # Default to None for no scopes.
   if scopes_param_prefix in url.query:
@@ -309,7 +310,7 @@ def auth_sub_string_from_body(http_body):
     The raw token value string to use in an AuthSubToken object.
   """
   for response_line in http_body.splitlines():
-    if response_line.startswith('Token='):
+    if response_line.startswith(b'Token='):
       # Strip off Token= and return the token value string.
       return response_line[6:]
   return None
@@ -317,7 +318,7 @@ def auth_sub_string_from_body(http_body):
 
 class AuthSubToken(object):
 
-  def __init__(self, token_string, scopes=None):
+  def __init__(self, token_string, scopes = None):
     self.token_string = token_string
     self.scopes = scopes or []
 
@@ -334,7 +335,7 @@ class AuthSubToken(object):
     Uses auth_sub_string_from_url.
 
     Args:
-      str_or_uri: The current page's URL (as a str or atom.http_core.Uri)
+      str_or_uri: The current page's URL (as string, bytes or atom.http_core.Uri)
                   which should contain a token query parameter since the
                   Google auth server redirected the user's browser to this
                   URL.
@@ -390,7 +391,7 @@ def generate_signature(data, rsa_key):
 
 class SecureAuthSubToken(AuthSubToken):
 
-  def __init__(self, token_string, rsa_private_key, scopes=None):
+  def __init__(self, token_string, rsa_private_key, scopes = None):
     self.token_string = token_string
     self.scopes = scopes or []
     self.rsa_private_key = rsa_private_key
@@ -444,8 +445,8 @@ HMAC_SHA1 = 'HMAC-SHA1'
 
 
 def build_oauth_base_string(http_request, consumer_key, nonce, signaure_type,
-                            timestamp, version, next='oob', token=None,
-                            verifier=None):
+                            timestamp, version, next = 'oob', token = None,
+                            verifier = None):
   """Generates the base string to be signed in the OAuth request.
 
   Args:
@@ -490,10 +491,10 @@ def build_oauth_base_string(http_request, consumer_key, nonce, signaure_type,
   sorted_keys = sorted(params.keys())
   pairs = []
   for key in sorted_keys:
-    pairs.append('%s=%s' % (urllib.parse.quote(key, safe='~'),
-                            urllib.parse.quote(params[key], safe='~')))
+    pairs.append('%s=%s' % (urllib.parse.quote(key, safe = '~'),
+                            urllib.parse.quote(params[key], safe = '~')))
   # We want to escape /'s too, so use safe='~'
-  all_parameters = urllib.parse.quote('&'.join(pairs), safe='~')
+  all_parameters = urllib.parse.quote('&'.join(pairs), safe = '~')
   normailzed_host = http_request.uri.host.lower()
   normalized_scheme = (http_request.uri.scheme or 'http').lower()
   non_default_port = None
@@ -509,47 +510,55 @@ def build_oauth_base_string(http_request, consumer_key, nonce, signaure_type,
     # Set the only safe char in url encoding to ~ since we want to escape /
     # as well.
     request_path = urllib.parse.quote('%s://%s:%s%s' % (
-        normalized_scheme, normailzed_host, non_default_port, path), safe='~')
+        normalized_scheme, normailzed_host, non_default_port, path), safe = '~')
   else:
     # Set the only safe char in url encoding to ~ since we want to escape /
     # as well.
     request_path = urllib.parse.quote('%s://%s%s' % (
-        normalized_scheme, normailzed_host, path), safe='~')
+        normalized_scheme, normailzed_host, path), safe = '~')
   # TODO: ensure that token escaping logic is correct, not sure if the token
   # value should be double escaped instead of single.
   base_string = '&'.join((http_request.method.upper(), request_path,
                           all_parameters))
   # Now we have the base string, we can calculate the oauth_signature.
-  return base_string
+  return bytes(base_string, 'ascii')
 
 
 def generate_hmac_signature(http_request, consumer_key, consumer_secret,
-                            timestamp, nonce, version, next='oob',
-                            token=None, token_secret=None, verifier=None):
-  import hmac
-  import base64
-  base_string = build_oauth_base_string(
-      http_request, consumer_key, nonce, HMAC_SHA1, timestamp, version,
-      next, token, verifier=verifier)
-  hash_key = None
-  hashed = None
-  if token_secret is not None:
-    hash_key = '%s&%s' % (urllib.parse.quote(consumer_secret, safe='~'),
-                          urllib.parse.quote(token_secret, safe='~'))
-  else:
-    hash_key = '%s&' % urllib.parse.quote(consumer_secret, safe='~')
-  try:
-    import hashlib
-    hashed = hmac.new(hash_key, base_string, hashlib.sha1)
-  except ImportError:
-    import sha
-    hashed = hmac.new(hash_key, base_string, sha)
-  return base64.b64encode(hashed.digest())
+                            timestamp, nonce, version, next = 'oob',
+                            token = None, token_secret = None, verifier = None):
 
+      # throwing an exception here somehow crashes python 3.1
+      assert isinstance(consumer_key, bytes)
+      assert isinstance(consumer_secret, bytes)
+      assert (token_secret is None) or isinstance(token_secret, bytes)
+      assert (token is None) or isinstance(token, bytes)
+      assert (nonce is None) or isinstance(nonce, bytes)
+
+      import hmac
+      import base64
+      import hashlib
+
+      base_string = build_oauth_base_string(
+          http_request, consumer_key, nonce, HMAC_SHA1, timestamp, version,
+          next, token, verifier = verifier)
+
+      hash_key = None
+      hashed = None
+      if token_secret is not None:
+        hash_key = bytes('%s&%s' % (urllib.parse.quote(consumer_secret, safe = b'~'),
+                              urllib.parse.quote(token_secret, safe = b'~')), 'ascii')
+      else:
+        hash_key = bytes('%s&' % urllib.parse.quote(consumer_secret, safe = b'~'), 'ascii')
+
+      assert isinstance(hash_key, bytes)
+
+      hashed = hmac.new(hash_key, base_string, hashlib.sha1)
+      return base64.b64encode(hashed.digest())
 
 def generate_rsa_signature(http_request, consumer_key, rsa_key,
-                           timestamp, nonce, version, next='oob',
-                           token=None, token_secret=None, verifier=None):
+                           timestamp, nonce, version, next = 'oob',
+                           token = None, token_secret = None, verifier = None):
   import base64
   try:
     from tlslite.utils import keyfactory
@@ -557,7 +566,7 @@ def generate_rsa_signature(http_request, consumer_key, rsa_key,
     from gdata.tlslite.utils import keyfactory
   base_string = build_oauth_base_string(
       http_request, consumer_key, nonce, RSA_SHA1, timestamp, version,
-      next, token, verifier=verifier)
+      next, token, verifier = verifier)
   private_key = keyfactory.parsePrivateKey(rsa_key)
   # Sign using the key
   signed = private_key.hashAndSign(base_string)
@@ -565,8 +574,8 @@ def generate_rsa_signature(http_request, consumer_key, rsa_key,
 
 
 def generate_auth_header(consumer_key, timestamp, nonce, signature_type,
-                         signature, version='1.0', next=None, token=None,
-                         verifier=None):
+                         signature, version = '1.0', next = None, token = None,
+                         verifier = None):
   """Builds the Authorization header to be sent in the request.
 
   Args:
@@ -600,7 +609,7 @@ def generate_auth_header(consumer_key, timestamp, nonce, signature_type,
     params['oauth_verifier'] = verifier
   pairs = [
       '%s="%s"' % (
-          k, urllib.quote(v, safe='~')) for k, v in params.iteritems()]
+          k, urllib.parse.quote(v, safe = '~')) for k, v in params.items()]
   return 'OAuth %s' % (', '.join(pairs))
 
 
@@ -609,8 +618,8 @@ ACCESS_TOKEN_URL = 'https://www.google.com/accounts/OAuthGetAccessToken'
 
 
 def generate_request_for_request_token(
-    consumer_key, signature_type, scopes, rsa_key=None, consumer_secret=None,
-    auth_server_url=REQUEST_TOKEN_URL, next='oob', version='1.0'):
+    consumer_key, signature_type, scopes, rsa_key = None, consumer_secret = None,
+    auth_server_url = REQUEST_TOKEN_URL, next = 'oob', version = '1.0'):
   """Creates request to be sent to auth server to get an OAuth request token.
 
   Args:
@@ -642,16 +651,16 @@ def generate_request_for_request_token(
   if scopes:
     request.uri.query['scope'] = ' '.join(scopes)
 
-  timestamp = str(int(time.time()))
-  nonce = ''.join([str(random.randint(0, 9)) for i in range(15)])
+  timestamp = int(time.time())
+  nonce = bytes(ord('0') + random.randint(0, 9) for _ in range(15))
   signature = None
   if signature_type == HMAC_SHA1:
     signature = generate_hmac_signature(
         request, consumer_key, consumer_secret, timestamp, nonce, version,
-        next=next)
+        next = next)
   elif signature_type == RSA_SHA1:
     signature = generate_rsa_signature(
-        request, consumer_key, rsa_key, timestamp, nonce, version, next=next)
+        request, consumer_key, rsa_key, timestamp, nonce, version, next = next)
   else:
     return None
 
@@ -663,7 +672,7 @@ def generate_request_for_request_token(
 
 
 def generate_request_for_access_token(
-    request_token, auth_server_url=ACCESS_TOKEN_URL):
+    request_token, auth_server_url = ACCESS_TOKEN_URL):
   """Creates a request to ask the OAuth server for an access token.
 
   Requires a request token which the user has authorized. See the
@@ -695,12 +704,13 @@ def oauth_token_info_from_body(http_body):
   """
   token = None
   token_secret = None
-  for pair in http_body.split('&'):
+  for pair in http_body.split(b'&'):
+    pair = str(pair, 'ascii')
     if pair.startswith('oauth_token='):
-      token = urllib.unquote(pair[len('oauth_token='):])
+      token = urllib.parse.unquote(pair[len('oauth_token='):])
     if pair.startswith('oauth_token_secret='):
-      token_secret = urllib.unquote(pair[len('oauth_token_secret='):])
-  return (token, token_secret)
+      token_secret = urllib.parse.unquote(pair[len('oauth_token_secret='):])
+  return (bytes(token, 'ascii'), bytes(token_secret, 'ascii'))
 
 
 def hmac_token_from_body(http_body, consumer_key, consumer_secret,
@@ -724,8 +734,8 @@ OAUTH_AUTHORIZE_URL = 'https://www.google.com/accounts/OAuthAuthorizeToken'
 
 
 def generate_oauth_authorization_url(
-    token, next=None, hd=DEFAULT_DOMAIN, hl=None, btmpl=None,
-    auth_server=OAUTH_AUTHORIZE_URL):
+    token, next = None, hd = DEFAULT_DOMAIN, hl = None, btmpl = None,
+    auth_server = OAUTH_AUTHORIZE_URL):
   """Creates a URL for the page where the request token can be authorized.
 
   Args:
@@ -750,7 +760,7 @@ def generate_oauth_authorization_url(
     user may allow or deny this app to access their Google data.
   """
   uri = atom.http_core.Uri.parse_uri(auth_server)
-  uri.query['oauth_token'] = token
+  uri.query['oauth_token'] = str(token, 'ascii')
   uri.query['hd'] = hd
   if next is not None:
     uri.query['oauth_callback'] = str(next)
@@ -773,10 +783,10 @@ def oauth_token_info_from_url(url):
   token = None
   verifier = None
   if 'oauth_token' in url.query:
-    token = urllib.unquote(url.query['oauth_token'])
+    token = urllib.parse.unquote(url.query['oauth_token'])
   if 'oauth_verifier' in url.query:
-    verifier = urllib.unquote(url.query['oauth_verifier'])
-  return (token, verifier)
+    verifier = urllib.parse.unquote(url.query['oauth_verifier'])
+  return (bytes(token, 'ascii') , bytes(verifier, 'ascii'))
 
 
 def authorize_request_token(request_token, url):
@@ -847,7 +857,7 @@ class OAuthHmacToken(object):
   SIGNATURE_METHOD = HMAC_SHA1
 
   def __init__(self, consumer_key, consumer_secret, token, token_secret,
-               auth_state, next=None, verifier=None):
+               auth_state, next = None, verifier = None):
     self.consumer_key = consumer_key
     self.consumer_secret = consumer_secret
     self.token = token
@@ -857,8 +867,8 @@ class OAuthHmacToken(object):
     self.verifier = verifier # Used to convert request token to access token.
 
   def generate_authorization_url(
-      self, google_apps_domain=DEFAULT_DOMAIN, language=None, btmpl=None,
-      auth_server=OAUTH_AUTHORIZE_URL):
+      self, google_apps_domain = DEFAULT_DOMAIN, language = None, btmpl = None,
+      auth_server = OAUTH_AUTHORIZE_URL):
     """Creates the URL at which the user can authorize this app to access.
 
     Args:
@@ -878,8 +888,8 @@ class OAuthHmacToken(object):
         'https://www.google.com/accounts/OAuthAuthorizeToken'
     """
     return generate_oauth_authorization_url(
-        self.token, hd=google_apps_domain, hl=language, btmpl=btmpl,
-        auth_server=auth_server)
+        self.token, hd = google_apps_domain, hl = language, btmpl = btmpl,
+        auth_server = auth_server)
 
   GenerateAuthorizationUrl = generate_authorization_url
 
@@ -894,15 +904,15 @@ class OAuthHmacToken(object):
       The same HTTP request object which was passed in.
     """
     timestamp = str(int(time.time()))
-    nonce = ''.join([str(random.randint(0, 9)) for i in xrange(15)])
+    nonce = bytes(ord('0') + random.randint(0, 9) for _ in range(15))
     signature = generate_hmac_signature(
         http_request, self.consumer_key, self.consumer_secret, timestamp,
-        nonce, version='1.0', next=self.next, token=self.token,
-        token_secret=self.token_secret, verifier=self.verifier)
+        nonce, version = '1.0', next = self.next, token = self.token,
+        token_secret = self.token_secret, verifier = self.verifier)
     http_request.headers['Authorization'] = generate_auth_header(
         self.consumer_key, timestamp, nonce, HMAC_SHA1, signature,
-        version='1.0', next=self.next, token=self.token,
-        verifier=self.verifier)
+        version = '1.0', next = self.next, token = self.token,
+        verifier = self.verifier)
     return http_request
 
   ModifyRequest = modify_request
@@ -912,7 +922,7 @@ class OAuthRsaToken(OAuthHmacToken):
   SIGNATURE_METHOD = RSA_SHA1
 
   def __init__(self, consumer_key, rsa_private_key, token, token_secret,
-               auth_state, next=None, verifier=None):
+               auth_state, next = None, verifier = None):
     self.consumer_key = consumer_key
     self.rsa_private_key = rsa_private_key
     self.token = token
@@ -935,12 +945,12 @@ class OAuthRsaToken(OAuthHmacToken):
     nonce = ''.join([str(random.randint(0, 9)) for i in xrange(15)])
     signature = generate_rsa_signature(
         http_request, self.consumer_key, self.rsa_private_key, timestamp,
-        nonce, version='1.0', next=self.next, token=self.token,
-        token_secret=self.token_secret, verifier=self.verifier)
+        nonce, version = '1.0', next = self.next, token = self.token,
+        token_secret = self.token_secret, verifier = self.verifier)
     http_request.headers['Authorization'] = generate_auth_header(
         self.consumer_key, timestamp, nonce, RSA_SHA1, signature,
-        version='1.0', next=self.next, token=self.token,
-        verifier=self.verifier)
+        version = '1.0', next = self.next, token = self.token,
+        verifier = self.verifier)
     return http_request
 
   ModifyRequest = modify_request
