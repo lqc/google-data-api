@@ -214,7 +214,7 @@ class RequestTest(unittest.TestCase):
     self.assertEqual(response.getheader('Echo-Host'), 'example.net:8080')
     self.assertEqual(response.getheader('Echo-Uri'), '/new/path?p=1')
     self.assertEqual(response.getheader('Echo-Scheme'), 'http')
-    self.assertEqual(response.read(), 'test')
+    self.assertEqual(response.read(), b'test')
 
   def test_gdata_version_header(self):
     client = gdata.client.GDClient()

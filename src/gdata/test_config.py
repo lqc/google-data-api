@@ -53,7 +53,7 @@ gdata.test_config.options.register(
 
 class Option(object):
 
-  def __init__(self, name, prompt, secret=False, description=None, default=None):
+  def __init__(self, name, prompt, secret = False, description = None, default = None):
     self.name = name
     self.prompt = prompt
     self.secret = secret
@@ -63,7 +63,7 @@ class Option(object):
   def get(self):
     value = self.default
     # Check for a command line parameter.
-    for i in xrange(len(sys.argv)):
+    for i in range(len(sys.argv)):
       if sys.argv[i].startswith('--%s=' % self.name):
         value = sys.argv[i].split('=')[1]
       elif sys.argv[i] == '--%s' % self.name:
@@ -78,13 +78,13 @@ class Option(object):
         value = getpass.getpass(prompt)
       else:
         print('You can specify this on the command line using --%s' % self.name)
-        value = raw_input(prompt)
+        value = input(prompt)
     return value
 
 
 class ConfigCollection(object):
 
-  def __init__(self, options=None):
+  def __init__(self, options = None):
     self.options = options or {}
     self.values = {}
 
@@ -118,78 +118,78 @@ options = ConfigCollection()
 # Register the default options.
 options.register(
     'username',
-    'Please enter the email address of your test account', 
-    description=('The email address you want to sign in with. '
+    'Please enter the email address of your test account',
+    description = ('The email address you want to sign in with. '
                  'Make sure this is a test account as these tests may edit'
                  ' or delete data.'))
 options.register(
     'password',
     'Please enter the password for your test account',
-    secret=True, description='The test accounts password.')
+    secret = True, description = 'The test accounts password.')
 options.register(
     'clearcache',
     'Delete cached data? (enter true or false)',
-    description=('If set to true, any temporary files which cache test'
+    description = ('If set to true, any temporary files which cache test'
                  ' requests and responses will be deleted.'),
-    default='true')
+    default = 'true')
 options.register(
     'savecache',
     'Save requests and responses in a temporary file? (enter true or false)',
-    description=('If set to true, requests to the server and responses will'
+    description = ('If set to true, requests to the server and responses will'
                  ' be saved in temporary files.'),
-    default='false')
+    default = 'false')
 options.register(
     'runlive',
     'Run the live tests which contact the server? (enter true or false)',
-    description=('If set to true, the tests will make real HTTP requests to'
+    description = ('If set to true, the tests will make real HTTP requests to'
                  ' the servers. This slows down test execution and may'
                  ' modify the users data, be sure to use a test account.'),
-    default='true')
+    default = 'true')
 options.register(
     'ssl',
     'Run the live tests over SSL (enter true or false)',
-    description='If set to true, all tests will be performed over HTTPS (SSL)',
-    default='false')
+    description = 'If set to true, all tests will be performed over HTTPS (SSL)',
+    default = 'false')
 
 # Other options which may be used if needed.
 BLOG_ID_OPTION = Option(
     'blogid',
     'Please enter the ID of your test blog',
-    description=('The blog ID for the blog which should have test posts added'
+    description = ('The blog ID for the blog which should have test posts added'
                  ' to it. Example 7682659670455539811'))
 TEST_IMAGE_LOCATION_OPTION = Option(
     'imgpath',
     'Please enter the full path to a test image to upload',
-    description=('This test image will be uploaded to a service which'
+    description = ('This test image will be uploaded to a service which'
                  ' accepts a media file, it must be a jpeg.'))
 SPREADSHEET_ID_OPTION = Option(
     'spreadsheetid',
     'Please enter the ID of a spreadsheet to use in these tests',
-    description=('The spreadsheet ID for the spreadsheet which should be'
+    description = ('The spreadsheet ID for the spreadsheet which should be'
                  ' modified by theses tests.'))
 SITES_DOMAIN_OPTION = Option(
     'sitedomain',
     'Please enter the domain of your Google Apps hosted Site',
-    description=('The domain the Site is hosted on or leave blank if n/a'),
-    default='site')
+    description = ('The domain the Site is hosted on or leave blank if n/a'),
+    default = 'site')
 SITES_NAME_OPTION = Option(
     'sitename',
     'Please enter name of your Google Site',
-    description='The webspace name of the Site found in its URL.')
+    description = 'The webspace name of the Site found in its URL.')
 PROJECT_NAME_OPTION = Option(
     'project_name',
     'Please enter the name of your project hosting project',
-    description=('The name of the project which should have test issues added'
+    description = ('The name of the project which should have test issues added'
                  ' to it. Example gdata-python-client'))
 ISSUE_ASSIGNEE_OPTION = Option(
     'issue_assignee',
     'Enter the email address of the target owner of the updated issue.',
-    description=('The email address of the user a created issue\'s owner will '
+    description = ('The email address of the user a created issue\'s owner will '
                  ' become. Example testuser2@gmail.com'))
 GA_TABLE_ID = Option(
     'table_id',
     'Enter the Table ID of the Google Analytics profile to test',
-    description=('The Table ID of the Google Analytics profile to test.'
+    description = ('The Table ID of the Google Analytics profile to test.'
                  ' Example ga:1174'))
 
 # Functions to inject a cachable HTTP client into a service client.
@@ -231,7 +231,7 @@ def configure_client(client, case_name, service_name):
     client.http_client.use_cached_session(cache_name)
     auth_token = client.request_client_login_token(
         options.get_value('username'), options.get_value('password'),
-        case_name, service=service_name)
+        case_name, service = service_name)
     options.values[auth_token_key] = gdata.gauth.token_to_blob(auth_token)
     client.http_client.close_session()
   # Allow a config auth_token of False to prevent the client's auth header
@@ -299,7 +299,7 @@ def configure_service(service, case_name, service_name):
     service.http_client.v2_http_client.use_cached_session(cache_name)
     service.ClientLogin(options.get_value('username'),
                         options.get_value('password'),
-                        service=service_name, source=case_name)
+                        service = service_name, source = case_name)
     options.values[auth_token_key] = service.GetClientLoginToken()
     service.http_client.v2_http_client.close_session()
   if auth_token_key in options.values:
@@ -352,15 +352,15 @@ def check_data_classes(test, classes):
       for versioned_qname in qname_versions:
         test.assert_(isinstance(versioned_qname, str),
                      'The class %s has a non-string _qname' % data_class)
-        test.assert_(not versioned_qname.endswith('}'), 
+        test.assert_(not versioned_qname.endswith('}'),
                      'The _qname for class %s is only a namespace' % (
                          data_class))
 
-    for attribute_name, value in data_class.__dict__.iteritems():
+    for attribute_name, value in data_class.__dict__.items():
       # Ignore all elements that start with _ (private members)
       if not attribute_name.startswith('_'):
         try:
-          if not (isinstance(value, str) or inspect.isfunction(value) 
+          if not (isinstance(value, str) or inspect.isfunction(value)
               or (isinstance(value, list)
                   and issubclass(value[0], atom.core.XmlElement))
               or type(value) == property # Allow properties.

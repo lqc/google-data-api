@@ -87,8 +87,8 @@ class DocsService(gdata.service.GDataService):
   __FILE_EXT_PATTERN = re.compile('.*\.([a-zA-Z]{3,}$)')
   __RESOURCE_ID_PATTERN = re.compile('^([a-z]*)(:|%3A)([\w-]*)$')
 
-  def __init__(self, email=None, password=None, source=None,
-               server='docs.google.com', additional_headers=None, **kwargs):
+  def __init__(self, email = None, password = None, source = None,
+               server = 'docs.google.com', additional_headers = None, **kwargs):
     """Creates a client for the Google Documents service.
 
     Args:
@@ -102,14 +102,14 @@ class DocsService(gdata.service.GDataService):
           constructor.
     """
     gdata.service.GDataService.__init__(
-        self, email=email, password=password, service='writely', source=source,
-        server=server, additional_headers=additional_headers, **kwargs)
+        self, email = email, password = password, service = 'writely', source = source,
+        server = server, additional_headers = additional_headers, **kwargs)
 
   def _MakeKindCategory(self, label):
     if label is None:
       return None
-    return atom.Category(scheme=DATA_KIND_SCHEME,
-        term=gdata.docs.DOCUMENTS_NAMESPACE + '#' + label, label=label)
+    return atom.Category(scheme = DATA_KIND_SCHEME,
+        term = gdata.docs.DOCUMENTS_NAMESPACE + '#' + label, label = label)
 
   def _MakeContentLinkFromId(self, resource_id):
     match = self.__RESOURCE_ID_PATTERN.match(resource_id)
@@ -122,9 +122,9 @@ class DocsService(gdata.service.GDataService):
     if label == SPREADSHEET_LABEL:
       return ('http://spreadsheets.google.com/feeds/download/spreadsheets/'
               'Export?key=%s' % doc_id)
-    raise ValueError, 'Invalid resource id: %s' % resource_id
+    raise ValueError('Invalid resource id: %s' % resource_id)
 
-  def _UploadFile(self, media_source, title, category, folder_or_uri=None):
+  def _UploadFile(self, media_source, title, category, folder_or_uri = None):
     """Uploads a file to the Document List feed.
 
     Args:
@@ -152,12 +152,12 @@ class DocsService(gdata.service.GDataService):
       uri = '/feeds/documents/private/full'
 
     entry = gdata.docs.DocumentListEntry()
-    entry.title = atom.Title(text=title)
+    entry.title = atom.Title(text = title)
     if category is not None:
       entry.category.append(category)
-    entry = self.Post(entry, uri, media_source=media_source,
-                      extra_headers={'Slug': media_source.file_name},
-                      converter=gdata.docs.DocumentListEntryFromString)
+    entry = self.Post(entry, uri, media_source = media_source,
+                      extra_headers = {'Slug': media_source.file_name},
+                      converter = gdata.docs.DocumentListEntryFromString)
     return entry
 
   def _DownloadFile(self, uri, file_path):
@@ -173,9 +173,9 @@ class DocsService(gdata.service.GDataService):
     server_response = self.request('GET', uri)
     response_body = server_response.read()
     if server_response.status != 200:
-      raise gdata.service.RequestError, {'status': server_response.status,
+      raise gdata.service.RequestError({'status': server_response.status,
                                          'reason': server_response.reason,
-                                         'body': response_body}
+                                         'body': response_body})
     f = open(file_path, 'wb')
     f.write(response_body)
     f.flush()
@@ -197,10 +197,10 @@ class DocsService(gdata.service.GDataService):
     entry = gdata.docs.DocumentListEntry()
     entry.id = source_entry.id
     entry = self.Post(entry, folder_entry.content.src,
-                      converter=gdata.docs.DocumentListEntryFromString)
+                      converter = gdata.docs.DocumentListEntryFromString)
     return entry
 
-  def Query(self, uri, converter=gdata.docs.DocumentListFeedFromString):
+  def Query(self, uri, converter = gdata.docs.DocumentListFeedFromString):
     """Queries the Document List feed and returns the resulting feed of
        entries.
 
@@ -215,7 +215,7 @@ class DocsService(gdata.service.GDataService):
           return a DocumentListFeed object. This is because most feed
           queries will result in a feed and not a single entry.
     """
-    return self.Get(uri, converter=converter)
+    return self.Get(uri, converter = converter)
 
   def QueryDocumentListFeed(self, uri):
     """Retrieves a DocumentListFeed by retrieving a URI based off the Document
@@ -229,7 +229,7 @@ class DocsService(gdata.service.GDataService):
     Returns:
       A DocumentListFeed object representing the feed returned by the server.
     """
-    return self.Get(uri, converter=gdata.docs.DocumentListFeedFromString)
+    return self.Get(uri, converter = gdata.docs.DocumentListFeedFromString)
 
   def GetDocumentListEntry(self, uri):
     """Retrieves a particular DocumentListEntry by its unique URI.
@@ -240,9 +240,9 @@ class DocsService(gdata.service.GDataService):
     Returns:
       A DocumentListEntry object representing the retrieved entry.
     """
-    return self.Get(uri, converter=gdata.docs.DocumentListEntryFromString)
+    return self.Get(uri, converter = gdata.docs.DocumentListEntryFromString)
 
-  def GetDocumentListFeed(self, uri=None):
+  def GetDocumentListFeed(self, uri = None):
     """Retrieves a feed containing all of a user's documents.
 
     Args:
@@ -261,7 +261,7 @@ class DocsService(gdata.service.GDataService):
     Returns:
       A DocumentListAclEntry object representing the retrieved entry.
     """
-    return self.Get(uri, converter=gdata.docs.DocumentListAclEntryFromString)
+    return self.Get(uri, converter = gdata.docs.DocumentListAclEntryFromString)
 
   def GetDocumentListAclFeed(self, uri):
     """Retrieves a feed containing all of a user's documents.
@@ -273,9 +273,9 @@ class DocsService(gdata.service.GDataService):
       A DocumentListAclFeed object representing the ACL feed
       returned by the server.
     """
-    return self.Get(uri, converter=gdata.docs.DocumentListAclFeedFromString)
+    return self.Get(uri, converter = gdata.docs.DocumentListAclFeedFromString)
 
-  def Upload(self, media_source, title, folder_or_uri=None, label=None):
+  def Upload(self, media_source, title, folder_or_uri = None, label = None):
     """Uploads a document inside of a MediaSource object to the Document List
        feed with the given title.
 
@@ -298,8 +298,8 @@ class DocsService(gdata.service.GDataService):
     return self._UploadFile(media_source, title, self._MakeKindCategory(label),
                             folder_or_uri)
 
-  def Download(self, entry_or_id_or_url, file_path, export_format=None,
-               gid=None, extra_params=None):
+  def Download(self, entry_or_id_or_url, file_path, export_format = None,
+               gid = None, extra_params = None):
     """Downloads a document from the Document List.
 
     Args:
@@ -325,13 +325,13 @@ class DocsService(gdata.service.GDataService):
 
     if export_format is not None:
       if url.find('/Export?') == -1:
-        raise gdata.service.Error, ('This entry cannot be exported '
+        raise gdata.service.Error('This entry cannot be exported '
                                     'as a different format')
       url += '&exportFormat=%s' % export_format
 
     if gid is not None:
       if url.find('spreadsheets') == -1:
-        raise gdata.service.Error, 'grid id param is not valid for this entry'
+        raise gdata.service.Error('grid id param is not valid for this entry')
       url += '&gid=%s' % gid
 
     if extra_params:
@@ -339,7 +339,7 @@ class DocsService(gdata.service.GDataService):
 
     self._DownloadFile(url, file_path)
 
-  def Export(self, entry_or_id_or_url, file_path, gid=None, extra_params=None):
+  def Export(self, entry_or_id_or_url, file_path, gid = None, extra_params = None):
     """Downloads a document from the Document List in a different format.
 
     Args:
@@ -360,7 +360,7 @@ class DocsService(gdata.service.GDataService):
       ext = match.group(1)
     self.Download(entry_or_id_or_url, file_path, ext, gid, extra_params)
 
-  def CreateFolder(self, title, folder_or_uri=None):
+  def CreateFolder(self, title, folder_or_uri = None):
     """Creates a folder in the Document List feed.
 
     Args:
@@ -383,10 +383,10 @@ class DocsService(gdata.service.GDataService):
       uri = '/feeds/documents/private/full'
 
     folder_entry = gdata.docs.DocumentListEntry()
-    folder_entry.title = atom.Title(text=title)
+    folder_entry.title = atom.Title(text = title)
     folder_entry.category.append(self._MakeKindCategory(FOLDER_LABEL))
     folder_entry = self.Post(folder_entry, uri,
-                             converter=gdata.docs.DocumentListEntryFromString)
+                             converter = gdata.docs.DocumentListEntryFromString)
 
     return folder_entry
 
@@ -406,7 +406,7 @@ class DocsService(gdata.service.GDataService):
   # Deprecated methods
 
   #@atom.deprecated('Please use Upload instead')
-  def UploadPresentation(self, media_source, title, folder_or_uri=None):
+  def UploadPresentation(self, media_source, title, folder_or_uri = None):
     """Uploads a presentation inside of a MediaSource object to the Document
        List feed with the given title.
 
@@ -428,13 +428,13 @@ class DocsService(gdata.service.GDataService):
     """
     return self._UploadFile(
         media_source, title, self._MakeKindCategory(PRESENTATION_LABEL),
-        folder_or_uri=folder_or_uri)
+        folder_or_uri = folder_or_uri)
 
   UploadPresentation = atom.deprecated('Please use Upload instead')(
       UploadPresentation)
 
   #@atom.deprecated('Please use Upload instead')
-  def UploadSpreadsheet(self, media_source, title, folder_or_uri=None):
+  def UploadSpreadsheet(self, media_source, title, folder_or_uri = None):
     """Uploads a spreadsheet inside of a MediaSource object to the Document
        List feed with the given title.
        
@@ -456,13 +456,13 @@ class DocsService(gdata.service.GDataService):
     """
     return self._UploadFile(
         media_source, title, self._MakeKindCategory(SPREADSHEET_LABEL),
-        folder_or_uri=folder_or_uri)
+        folder_or_uri = folder_or_uri)
 
   UploadSpreadsheet = atom.deprecated('Please use Upload instead')(
       UploadSpreadsheet)
 
   #@atom.deprecated('Please use Upload instead')
-  def UploadDocument(self, media_source, title, folder_or_uri=None):
+  def UploadDocument(self, media_source, title, folder_or_uri = None):
     """Uploads a document inside of a MediaSource object to the Document List
        feed with the given title.
        
@@ -484,7 +484,7 @@ class DocsService(gdata.service.GDataService):
     """
     return self._UploadFile(
         media_source, title, self._MakeKindCategory(DOCUMENT_LABEL),
-        folder_or_uri=folder_or_uri)
+        folder_or_uri = folder_or_uri)
 
   UploadDocument = atom.deprecated('Please use Upload instead')(
       UploadDocument)
@@ -509,9 +509,9 @@ class DocumentQuery(gdata.service.Query):
 
   """Object used to construct a URI to query the Google Document List feed"""
 
-  def __init__(self, feed='/feeds/documents', visibility='private',
-      projection='full', text_query=None, params=None,
-      categories=None):
+  def __init__(self, feed = '/feeds/documents', visibility = 'private',
+      projection = 'full', text_query = None, params = None,
+      categories = None):
     """Constructor for Document List Query
 
     Args:
@@ -585,7 +585,7 @@ class DocumentAclQuery(gdata.service.Query):
 
   """Object used to construct a URI to query a Document's ACL feed"""
 
-  def __init__(self, resource_id, feed='/feeds/acl/private/full'):
+  def __init__(self, resource_id, feed = '/feeds/acl/private/full'):
     """Constructor for Document ACL Query
 
     Args:

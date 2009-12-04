@@ -91,9 +91,12 @@ class HttpRequest(object):
       size: int Required if the data is a file like object. If the data is a
             string, the size is calculated so this parameter is ignored.
     """
+    if isinstance(data, str):
+      data = bytes(data, 'ascii')
 
     if isinstance(data, bytes):
       size = len(data)
+
     if size is None:
       # TODO: support chunked transfer if some of the body is of unknown size.
       raise UnknownSize('Each part of the body must have a known size.')
@@ -162,7 +165,7 @@ class HttpRequest(object):
                  to 'application/x-www-form-urlencoded'.
     """
     body = urllib.parse.urlencode(form_data)
-    self.add_body_part(body, mime_type)
+    self.add_body_part(body, bytes(mime_type, 'ascii'))
 
   AddFormInputs = add_form_inputs
 
@@ -423,7 +426,7 @@ class HttpClient(object):
         pass
 
     # Send the HTTP headers.
-    for header_name, value in headers.iteritems():
+    for header_name, value in headers.items():
       connection.putheader(header_name, value)
     connection.endheaders()
 
@@ -437,7 +440,7 @@ class HttpClient(object):
 
 
 def _send_data_part(data, connection):
-  if isinstance(data, str):
+  if isinstance(data, bytes):
     # I might want to just allow str, not unicode.
     connection.send(data)
     return
@@ -452,7 +455,7 @@ def _send_data_part(data, connection):
   else:
     # The data object was not a file.
     # Try to convert to a string and send the data.
-    connection.send(str(data))
+    connection.send(bytes(data, 'ascii'))
     return
 
 

@@ -105,13 +105,13 @@ class SiteEntryTest(unittest.TestCase):
   def testCreateSiteEntry(self):
     entry = gdata.sites.data.SiteEntry()
     parent_link = atom.data.Link(
-        rel=gdata.sites.data.SITES_PARENT_LINK_REL, href='abc')
+        rel = gdata.sites.data.SITES_PARENT_LINK_REL, href = 'abc')
     entry.link.append(parent_link)
     entry.category.append(
         atom.data.Category(
-            scheme=gdata.sites.data.SITES_KIND_SCHEME,
-            term='%s#%s' % (gdata.sites.data.SITES_NAMESPACE, 'webpage'),
-            label='webpage'))
+            scheme = gdata.sites.data.SITES_KIND_SCHEME,
+            term = '%s#%s' % (gdata.sites.data.SITES_NAMESPACE, 'webpage'),
+            label = 'webpage'))
     self.assertEqual(entry.Kind(), 'webpage')
     self.assertEqual(entry.category[0].label, 'webpage')
     self.assertEqual(
@@ -121,7 +121,7 @@ class SiteEntryTest(unittest.TestCase):
     self.assertEqual(entry.link[0].rel,
                      'http://schemas.google.com/sites/2008#parent')
 
-    entry2 = gdata.sites.data.SiteEntry(kind='webpage')
+    entry2 = gdata.sites.data.SiteEntry(kind = 'webpage')
     self.assertEqual(
         entry2.category[0].term,
         '%s#%s' % ('http://schemas.google.com/sites/2008', 'webpage'))
@@ -154,14 +154,14 @@ class ContentFeedTest(unittest.TestCase):
   def testCreateContentEntry(self):
     new_entry = gdata.sites.data.ContentEntry()
     new_entry.content = gdata.sites.data.Content()
-    new_entry.content.html = '<div><p>here is html</p></div>'
+    new_entry.content.html = b'<div><p>here is html</p></div>'
     self.assert_(isinstance(new_entry, gdata.sites.data.ContentEntry))
     self.assert_(isinstance(new_entry.content, gdata.sites.data.Content))
     self.assert_(isinstance(new_entry.content.html, atom.core.XmlElement))
 
     new_entry2 = gdata.sites.data.ContentEntry()
     new_entry2.content = gdata.sites.data.Content(
-        html='<div><p>here is html</p></div>')
+        html = b'<div><p>here is html</p></div>')
     self.assert_(isinstance(new_entry2, gdata.sites.data.ContentEntry))
     self.assert_(isinstance(new_entry2.content, gdata.sites.data.Content))
     self.assert_(isinstance(new_entry2.content.html, atom.core.XmlElement))
@@ -176,7 +176,7 @@ class ContentFeedTest(unittest.TestCase):
              'listpage': self.feed.GetListPages,
              'webpage': self.feed.GetWebpages}
 
-    for k, v in kinds.iteritems():
+    for k, v in kinds.items():
       entries = v()
       self.assertEqual(len(entries), 1)
       for entry in entries:

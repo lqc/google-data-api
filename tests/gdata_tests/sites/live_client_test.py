@@ -41,8 +41,8 @@ class SitesClientTest(unittest.TestCase):
     self.client = None
     if conf.options.get_value('runlive') == 'true':
       self.client = gdata.sites.client.SitesClient(
-          site=conf.options.get_value('sitename'),
-          domain=conf.options.get_value('sitedomain'))
+          site = conf.options.get_value('sitename'),
+          domain = conf.options.get_value('sitedomain'))
       if conf.options.get_value('ssl') == 'true':
         self.client.ssl = True
       conf.configure_client(self.client, 'SitesTest', self.client.auth_service)
@@ -84,8 +84,8 @@ class SitesClientTest(unittest.TestCase):
     conf.configure_cache(self.client, 'testCreateAndUploadToFilecabinet')
 
     filecabinet = self.client.CreatePage(
-        'filecabinet', 'FilesGoHere', '<b>Your html content</b>',
-        page_name='diff-pagename-than-title')
+        'filecabinet', 'FilesGoHere', b'<b>Your html content</b>',
+        page_name = 'diff-pagename-than-title')
 
     self.assertEqual(filecabinet.title.text, 'FilesGoHere')
     self.assertEqual(filecabinet.page_name.text, 'diff-pagename-than-title')
@@ -95,8 +95,8 @@ class SitesClientTest(unittest.TestCase):
     # Upload a file to the filecabinet
     filepath = conf.options.get_value('imgpath')
     attachment = self.client.UploadAttachment(
-        filepath, filecabinet, content_type='image/jpeg', title='TestImageFile',
-        description='description here')
+        filepath, filecabinet, content_type = 'image/jpeg', title = 'TestImageFile',
+        description = 'description here')
 
     self.assertEqual(attachment.title.text, 'TestImageFile')
     self.assertEqual(attachment.FindParentLink(),

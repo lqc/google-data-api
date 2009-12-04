@@ -239,7 +239,7 @@ class EchoHttpClient(object):
     response._headers['Echo-Scheme'] = uri.scheme
     response._headers['Echo-Method'] = method
     for part in body_parts:
-      if isinstance(part, str):
+      if isinstance(part, bytes):
         body.write(part)
       elif hasattr(part, 'read'):
         body.write(part.read())

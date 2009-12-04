@@ -50,7 +50,7 @@ try:
   ssl_imported = True
 except ImportError:
   pass
-  
+
 
 
 class ProxyError(atom.http_interface.Error):
@@ -69,11 +69,11 @@ class HttpClient(atom.http_interface.GenericHttpClient):
   # http_code.HttpClient. Used in unit tests to inject a mock client.
   v2_http_client = None
 
-  def __init__(self, headers=None):
+  def __init__(self, headers = None):
     self.debug = False
     self.headers = headers or {}
 
-  def request(self, operation, url, data=None, headers=None):
+  def request(self, operation, url, data = None, headers = None):
     """Performs an HTTP call to the server, supports GET, POST, PUT, and 
     DELETE.
 
@@ -103,7 +103,7 @@ class HttpClient(atom.http_interface.GenericHttpClient):
     # If the list of headers does not include a Content-Length, attempt to
     # calculate it based on the data object.
     if data and 'Content-Length' not in all_headers:
-      if isinstance(data, types.StringTypes):
+      if isinstance(data, bytes):
         all_headers['Content-Length'] = str(len(data))
       else:
         raise atom.http_interface.ContentLengthRequired('Unable to calculate '
@@ -115,12 +115,12 @@ class HttpClient(atom.http_interface.GenericHttpClient):
       all_headers['Content-Type'] = DEFAULT_CONTENT_TYPE
 
     if self.v2_http_client is not None:
-      http_request = atom.http_core.HttpRequest(method=operation)
+      http_request = atom.http_core.HttpRequest(method = operation)
       atom.http_core.Uri.parse_uri(str(url)).modify_request(http_request)
       http_request.headers = all_headers
       if data:
         http_request._body_parts.append(data)
-      return self.v2_http_client.request(http_request=http_request)
+      return self.v2_http_client.request(http_request = http_request)
 
     if not isinstance(url, atom.url.Url):
       if isinstance(url, str):
@@ -128,14 +128,14 @@ class HttpClient(atom.http_interface.GenericHttpClient):
       else:
         raise atom.http_interface.UnparsableUrlObject('Unable to parse url '
             'parameter because it was not a string or atom.url.Url')
-    
+
     connection = self._prepare_connection(url, all_headers)
 
     if self.debug:
       connection.debuglevel = 1
 
-    connection.putrequest(operation, self._get_access_url(url), 
-        skip_host=True)
+    connection.putrequest(operation, self._get_access_url(url),
+        skip_host = True)
     if url.port is not None:
       connection.putheader('Host', '%s:%s' % (url.host, url.port))
     else:
@@ -172,7 +172,7 @@ class HttpClient(atom.http_interface.GenericHttpClient):
 
     # Return the HTTP Response from the server.
     return connection.getresponse()
-    
+
   def _prepare_connection(self, url, headers):
     if not isinstance(url, atom.url.Url):
       if isinstance(url, types.StringTypes):
@@ -215,28 +215,28 @@ class ProxiedHttpClient(HttpClient):
         # Set any proxy auth headers 
         if proxy_auth:
           proxy_auth = 'Proxy-authorization: %s' % proxy_auth
-          
+
         # Construct the proxy connect command.
         port = url.port
         if not port:
           port = '443'
         proxy_connect = 'CONNECT %s:%s HTTP/1.0\r\n' % (url.host, port)
-        
+
         # Set the user agent to send to the proxy
         if headers and 'User-Agent' in headers:
           user_agent = 'User-Agent: %s\r\n' % (headers['User-Agent'])
         else:
           user_agent = ''
-        
+
         proxy_pieces = '%s%s%s\r\n' % (proxy_connect, proxy_auth, user_agent)
-        
+
         # Find the proxy host and port.
         proxy_url = atom.url.parse_url(proxy)
         if not proxy_url.port:
           proxy_url.port = '80'
-        
+
         # Connect to the proxy server, very simple recv and error checking
-        p_sock = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+        p_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         p_sock.connect((proxy_url.host, int(proxy_url.port)))
         p_sock.sendall(proxy_pieces)
         response = ''
@@ -244,7 +244,7 @@ class ProxiedHttpClient(HttpClient):
         # Wait for the full response.
         while response.find("\r\n\r\n") == -1:
           response += p_sock.recv(8192)
-       
+
         p_status = response.split()[1]
         if p_status != str(200):
           raise ProxyError('Error status=%s' % str(p_status))
@@ -256,7 +256,7 @@ class ProxiedHttpClient(HttpClient):
         else:
           sock_ssl = socket.ssl(p_sock, None, None)
           sslobj = httplib.FakeSocket(p_sock, sock_ssl)
- 
+
         # Initalize httplib and replace with the proxy socket.
         connection = httplib.HTTPConnection(proxy_url.host)
         connection.sock = sslobj
@@ -271,7 +271,7 @@ class ProxiedHttpClient(HttpClient):
         proxy_url = atom.url.parse_url(proxy)
         if not proxy_url.port:
           proxy_url.port = '80'
-        
+
         if proxy_auth:
           headers['Proxy-Authorization'] = proxy_auth.strip()
 
@@ -300,7 +300,7 @@ def _get_proxy_auth():
 
 
 def _send_data_part(data, connection):
-  if isinstance(data, types.StringTypes):
+  if isinstance(data, bytes):
     connection.send(data)
     return
   # Check to see if data is a file-like object that has a read method.

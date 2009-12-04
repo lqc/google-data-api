@@ -177,8 +177,8 @@ class ClientLoginToken(object):
     self.token_string = token_string
 
   def modify_request(self, http_request):
-    http_request.headers['Authorization'] = '%s%s' % (PROGRAMMATIC_AUTH_LABEL,
-        self.token_string)
+    http_request.headers['Authorization'] = '{}{}'.format(
+        PROGRAMMATIC_AUTH_LABEL, str(self.token_string, 'ascii'))
 
   ModifyRequest = modify_request
 
@@ -967,7 +967,7 @@ def _join_token_parts(*args):
   Returns:
     A string in the form 1x|member1|member2|member3...
   """
-  return '|'.join([urllib.quote_plus(a or '') for a in args])
+  return '|'.join([urllib.parse.quote_plus(a or '') for a in args])
 
 
 def _split_token_parts(blob):
@@ -985,7 +985,7 @@ def _split_token_parts(blob):
   Returns:
     A list of unescaped strings.
   """
-  return [urllib.unquote_plus(part) or None for part in blob.split('|')]
+  return [urllib.parse.unquote_plus(part) or None for part in blob.split('|')]
 
 
 def token_to_blob(token):

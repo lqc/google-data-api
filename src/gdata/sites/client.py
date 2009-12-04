@@ -39,7 +39,7 @@ class SitesClient(gdata.client.GDClient):
   api_version = '1'  # default major version for the service.
   auth_service = 'jotspot'
 
-  def __init__(self, site=None, domain=None, auth_token=None, **kwargs):
+  def __init__(self, site = None, domain = None, auth_token = None, **kwargs):
     """Constructs a new client for the Sites API.
 
     Args:
@@ -52,7 +52,7 @@ class SitesClient(gdata.client.GDClient):
       kwargs: The other parameters to pass to gdata.client.GDClient
           constructor.
     """
-    gdata.client.GDClient.__init__(self, auth_token=auth_token, **kwargs)
+    gdata.client.GDClient.__init__(self, auth_token = auth_token, **kwargs)
     self.site = site
     if domain is not None:
       self.domain = domain
@@ -61,12 +61,12 @@ class SitesClient(gdata.client.GDClient):
     if label is None:
       return None
     return atom.data.Category(
-        scheme=gdata.sites.data.SITES_KIND_SCHEME,
-        term='%s#%s' % (gdata.sites.data.SITES_NAMESPACE, label), label=label)
+        scheme = gdata.sites.data.SITES_KIND_SCHEME,
+        term = '%s#%s' % (gdata.sites.data.SITES_NAMESPACE, label), label = label)
 
   __MakeKindCategory = __make_kind_category
 
-  def __upload(self, entry, media_source, auth_token=None, **kwargs):
+  def __upload(self, entry, media_source, auth_token = None, **kwargs):
     """Uploads an attachment file to the Sites API.
 
     Args:
@@ -80,8 +80,8 @@ class SitesClient(gdata.client.GDClient):
       The created entry.
     """
     uri = self.make_content_feed_uri()
-    return self.post(entry, uri, media_source=media_source,
-                     auth_token=auth_token, **kwargs)
+    return self.post(entry, uri, media_source = media_source,
+                     auth_token = auth_token, **kwargs)
 
   def _get_file_content(self, uri):
     """Fetches the file conten from the specified uri.
@@ -97,9 +97,9 @@ class SitesClient(gdata.client.GDClient):
     """
     server_response = self.request('GET', uri)
     if server_response.status != 200:
-      raise  gdata.client.RequestError, {'status': server_response.status,
+      raise  gdata.client.RequestError({'status': server_response.status,
                                          'reason': server_response.reason,
-                                         'body': server_response.read()}
+                                         'body': server_response.read()})
     return server_response.read()
 
   _GetFileContent = _get_file_content
@@ -119,7 +119,7 @@ class SitesClient(gdata.client.GDClient):
 
   MakeActivityFeedUri = make_activity_feed_uri
 
-  def get_content_feed(self, uri=None, auth_token=None, **kwargs):
+  def get_content_feed(self, uri = None, auth_token = None, **kwargs):
     """Retrieves the content feed containing the current state of site.
 
     Args:
@@ -133,12 +133,12 @@ class SitesClient(gdata.client.GDClient):
     """
     if uri is None:
       uri = self.make_content_feed_uri()
-    return self.get_feed(uri, desired_class=gdata.sites.data.ContentFeed,
-                         auth_token=auth_token, **kwargs)
+    return self.get_feed(uri, desired_class = gdata.sites.data.ContentFeed,
+                         auth_token = auth_token, **kwargs)
 
   GetContentFeed = get_content_feed
 
-  def get_revision_feed(self, entry_or_uri_or_id, auth_token=None, **kwargs):
+  def get_revision_feed(self, entry_or_uri_or_id, auth_token = None, **kwargs):
     """Retrieves the revision feed containing the revision history for a node.
 
     Args:
@@ -159,12 +159,12 @@ class SitesClient(gdata.client.GDClient):
       uri += entry_or_uri_or_id
     else:
       uri = entry_or_uri_or_id
-    return self.get_feed(uri, desired_class=gdata.sites.data.RevisionFeed,
-                         auth_token=auth_token, **kwargs)
+    return self.get_feed(uri, desired_class = gdata.sites.data.RevisionFeed,
+                         auth_token = auth_token, **kwargs)
 
   GetRevisionFeed = get_revision_feed
 
-  def get_activity_feed(self, uri=None, auth_token=None, **kwargs):
+  def get_activity_feed(self, uri = None, auth_token = None, **kwargs):
     """Retrieves the activity feed containing recent Site activity.
 
     Args:
@@ -178,13 +178,13 @@ class SitesClient(gdata.client.GDClient):
     """
     if uri is None:
       uri = self.make_activity_feed_uri()
-    return self.get_feed(uri, desired_class=gdata.sites.data.ActivityFeed,
-                         auth_token=auth_token, **kwargs)
+    return self.get_feed(uri, desired_class = gdata.sites.data.ActivityFeed,
+                         auth_token = auth_token, **kwargs)
 
   GetActivityFeed = get_activity_feed
 
-  def create_page(self, kind, title, html='', page_name=None, parent=None,
-                  auth_token=None, **kwargs):
+  def create_page(self, kind, title, html = '', page_name = None, parent = None,
+                  auth_token = None, **kwargs):
     """Creates a new page (specified by kind) on a Google Site.
 
     Args:
@@ -205,31 +205,31 @@ class SitesClient(gdata.client.GDClient):
       gdata.sites.data.ContentEntry of the created page.
     """
     new_entry = gdata.sites.data.ContentEntry(
-        title=atom.data.Title(text=title), kind=kind,
-        content=gdata.sites.data.Content(text=html))
+        title = atom.data.Title(text = title), kind = kind,
+        content = gdata.sites.data.Content(text = html))
 
     if page_name is not None:
-      new_entry.page_name = gdata.sites.data.PageName(text=page_name)
+      new_entry.page_name = gdata.sites.data.PageName(text = page_name)
 
     # Add parent link to entry if it should be uploaded as a subpage.
     if isinstance(parent, gdata.sites.data.ContentEntry):
-      parent_link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                                   type='application/atom+xml',
-                                   href=parent.GetSelfLink().href)
+      parent_link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                                   type = 'application/atom+xml',
+                                   href = parent.GetSelfLink().href)
       new_entry.link.append(parent_link)
     elif parent is not None:
-      parent_link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                                   type='application/atom+xml',
-                                   href=parent)
+      parent_link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                                   type = 'application/atom+xml',
+                                   href = parent)
       new_entry.link.append(parent_link)
 
     return self.post(new_entry, self.make_content_feed_uri(),
-                     auth_token=auth_token, **kwargs)
+                     auth_token = auth_token, **kwargs)
 
   CreatePage = create_page
 
   def create_webattachment(self, src, content_type, title, parent,
-                           description=None, auth_token=None, **kwargs):
+                           description = None, auth_token = None, **kwargs):
     """Creates a new webattachment within a filecabinet.
 
     Args:
@@ -247,32 +247,32 @@ class SitesClient(gdata.client.GDClient):
       gdata.sites.data.ContentEntry of the created page.
     """
     new_entry = gdata.sites.data.ContentEntry(
-        title=atom.data.Title(text=title), kind='webattachment',
-        content=gdata.sites.data.Content(src=src, type=content_type))
+        title = atom.data.Title(text = title), kind = 'webattachment',
+        content = gdata.sites.data.Content(src = src, type = content_type))
 
     if isinstance(parent, gdata.sites.data.ContentEntry):
-      link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                            type='application/atom+xml',
-                            href=parent.GetSelfLink().href)
+      link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                            type = 'application/atom+xml',
+                            href = parent.GetSelfLink().href)
     elif parent is not None:
-      link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                            type='application/atom+xml', href=parent)
+      link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                            type = 'application/atom+xml', href = parent)
 
     new_entry.link.append(link)
 
     # Add file decription if it was specified
     if description is not None:
-      new_entry.summary = gdata.sites.data.Summary(type='text',
-                                                   text=description)
+      new_entry.summary = gdata.sites.data.Summary(type = 'text',
+                                                   text = description)
 
     return self.post(new_entry, self.make_content_feed_uri(),
-                     auth_token=auth_token, **kwargs)
+                     auth_token = auth_token, **kwargs)
 
   CreateWebAttachment = create_webattachment
 
-  def upload_attachment(self, file_handle, parent, content_type=None,
-                        title=None, description=None, folder_name=None,
-                        auth_token=None, **kwargs):
+  def upload_attachment(self, file_handle, parent, content_type = None,
+                        title = None, description = None, folder_name = None,
+                        auth_token = None, **kwargs):
     """Uploads an attachment to a parent page.
 
     Args:
@@ -299,17 +299,17 @@ class SitesClient(gdata.client.GDClient):
       attachment.
     """
     if isinstance(parent, gdata.sites.data.ContentEntry):
-      link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                            type='application/atom+xml',
-                            href=parent.GetSelfLink().href)
+      link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                            type = 'application/atom+xml',
+                            href = parent.GetSelfLink().href)
     else:
-      link = atom.data.Link(rel=gdata.sites.data.SITES_PARENT_LINK_REL,
-                            type='application/atom+xml',
-                            href=parent)
+      link = atom.data.Link(rel = gdata.sites.data.SITES_PARENT_LINK_REL,
+                            type = 'application/atom+xml',
+                            href = parent)
 
     if not isinstance(file_handle, gdata.data.MediaSource):
-      ms = gdata.data.MediaSource(file_path=file_handle,
-                                  content_type=content_type)
+      ms = gdata.data.MediaSource(file_path = file_handle,
+                                  content_type = content_type)
     else:
       ms = file_handle
 
@@ -317,22 +317,22 @@ class SitesClient(gdata.client.GDClient):
     if title is None:
       title = ms.file_name
 
-    new_entry = gdata.sites.data.ContentEntry(kind='attachment')
-    new_entry.title = atom.data.Title(text=title)
+    new_entry = gdata.sites.data.ContentEntry(kind = 'attachment')
+    new_entry.title = atom.data.Title(text = title)
     new_entry.link.append(link)
 
     # Add file decription if it was specified
     if description is not None:
-      new_entry.summary = gdata.sites.data.Summary(type='text',
-                                                   text=description)
+      new_entry.summary = gdata.sites.data.Summary(type = 'text',
+                                                   text = description)
 
     # Upload the attachment to a filecabinet folder?
     if parent.Kind() == 'filecabinet' and folder_name is not None:
       folder_category = atom.data.Category(
-          scheme=gdata.sites.data.FOLDER_KIND_TERM, term=folder_name)
+          scheme = gdata.sites.data.FOLDER_KIND_TERM, term = folder_name)
       new_entry.category.append(folder_category)
 
-    return self.__upload(new_entry, ms, auth_token=auth_token, **kwargs)
+    return self.__upload(new_entry, ms, auth_token = auth_token, **kwargs)
 
   UploadAttachment = upload_attachment
 
@@ -353,7 +353,7 @@ class SitesClient(gdata.client.GDClient):
     f = open(file_path, 'wb')
     try:
       f.write(self._get_file_content(uri))
-    except gdata.client.RequestError, e:
+    except gdata.client.RequestError as e:
       f.close()
       raise e
     f.flush()

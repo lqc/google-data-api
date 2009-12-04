@@ -124,10 +124,10 @@ class InReplyTo(atom.core.XmlElement):
 class Content(atom.data.Content):
   """Google Sites version of <atom:content> that encapsulates XHTML."""
 
-  def __init__(self, html=None, type=None, **kwargs):
+  def __init__(self, html = None, type = None, **kwargs):
     if type is None and html:
       type = 'xhtml'
-    super(Content, self).__init__(type=type, **kwargs)
+    super(Content, self).__init__(type = type, **kwargs)
     if html is not None:
       self.html = html
 
@@ -142,7 +142,7 @@ class Content(atom.data.Content):
       self.children = []
       return
 
-    if type(html) == str:
+    if type(html) == bytes:
       html = atom.core.parse(html)
       if not html.namespace:
         html.namespace = XHTML_NAMESPACE
@@ -155,11 +155,11 @@ class Content(atom.data.Content):
 class Summary(atom.data.Summary):
   """Google Sites version of <atom:summary>."""
 
-  def __init__(self, html=None, type=None, text=None, **kwargs):
+  def __init__(self, html = None, type = None, text = None, **kwargs):
     if type is None and html:
       type = 'xhtml'
 
-    super(Summary, self).__init__(type=type, text=text, **kwargs)
+    super(Summary, self).__init__(type = type, text = text, **kwargs)
     if html is not None:
       self.html = html
 
@@ -187,13 +187,13 @@ class Summary(atom.data.Summary):
 class SiteEntry(gdata.data.GDEntry):
   """Google Sites Entry."""
 
-  def __init__(self, kind=None, **kwargs):
+  def __init__(self, kind = None, **kwargs):
     super(SiteEntry, self).__init__(**kwargs)
     if kind is not None:
       self.category.append(
-          atom.data.Category(scheme=SITES_KIND_SCHEME,
-                             term='%s#%s' % (SITES_NAMESPACE, kind),
-                             label=kind))
+          atom.data.Category(scheme = SITES_KIND_SCHEME,
+                             term = '%s#%s' % (SITES_NAMESPACE, kind),
+                             label = kind))
 
   def __find_category_scheme(self, scheme):
     for category in self.category:
